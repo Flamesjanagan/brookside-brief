@@ -2,9 +2,8 @@ name: Daily Macro Update
 
 on:
   schedule:
-    # 8:30 AM Eastern = 13:30 UTC  |  runs Mon–Fri only
     - cron: "30 13 * * 1-5"
-  workflow_dispatch:   # lets you trigger manually from the GitHub Actions tab
+  workflow_dispatch:
 
 jobs:
   update:
@@ -15,6 +14,11 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Sync to latest remote
+        run: |
+          git fetch origin
+          git reset --hard origin/main
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -29,3 +33,11 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python scripts/update_macro.py
+
+      - name: Commit and push updated site
+        run: |
+          git config user.name  "Brookside Brief Bot"
+          git config user.email "bot@brooksidebrief.com"
+          git add index.html
+          git diff --staged --quiet || git commit -m "Daily macro update: $(date -u '+%Y-%m-%d')"
+          git push --force origin main
