@@ -10,7 +10,7 @@ jobs:
   update:
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # needed to push the updated index.html back
+      contents: write
 
     steps:
       - name: Checkout repo
@@ -27,15 +27,5 @@ jobs:
       - name: Run macro update script
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python scripts/update_macro.py
-
-      - name: Commit and push updated site
-        run: |
-          git config user.name  "Brookside Brief Bot"
-          git config user.email "bot@brooksidebrief.com"
-          git add index.html
-          # Only commit if something actually changed
-          git diff --staged --quiet || git commit -m "Daily macro update: $(date -u '+%Y-%m-%d')"
-          # Force push — script already fetched the latest from GitHub before editing,
-          # so this will never lose user changes
-          git push --force

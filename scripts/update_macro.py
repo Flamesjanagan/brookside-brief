@@ -272,7 +272,52 @@ def update_html(new_macro_html: str, today_str: str, today_long: str) -> bool:
 
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(new_content)
+
+    # If GITHUB_TOKEN is available, commit directly via API — no git push needed
+    github_token = os.environ.get("GITHUB_TOKEN")
+    if github_token:
+        try:
+            _github_api_commit(new_content, github_token, today_str)
+            print("  Committed via GitHub API — no git push required.")
+            return "api"
+        except Exception as e:
+            print(f"  API commit failed ({e}), falling back to local file write.")
+
     return True
+
+
+def _github_api_commit(content: str, token: str, today_str: str):
+    """Push index.html directly via GitHub Contents API — always conflict-free."""
+    import json, base64, urllib.request, urllib.error
+
+    repo = "Flamesjanagan/brookside-brief"
+    path = "index.html"
+    api  = f"https://api.github.com/repos/{repo}/contents/{path}"
+    headers = {
+        "Authorization": f"token {token}",
+        "Accept": "application/vnd.github.v3+json",
+        "Content-Type": "application/json",
+    }
+
+    # 1. Get current file SHA
+    req = urllib.request.Request(api, headers=headers)
+    with urllib.request.urlopen(req) as r:
+        sha = json.loads(r.read())["sha"]
+
+    # 2. PUT updated content
+    body = json.dumps({
+        "message": f"Daily macro update: {today_str}",
+        "content": base64.b64encode(content.encode("utf-8")).decode("ascii"),
+        "sha": sha,
+        "committer": {"name": "Brookside Brief Bot", "email": "bot@brooksidebrief.com"},
+    }).encode("utf-8")
+
+    req = urllib.request.Request(api, data=body, method="PUT", headers=headers)
+    with urllib.request.urlopen(req) as r:
+        result = json.loads(r.read())
+
+    commit_sha = result["commit"]["sha"][:7]
+    print(f"  GitHub API commit: {commit_sha}")
 
 
 def main():
