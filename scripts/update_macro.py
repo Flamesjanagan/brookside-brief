@@ -222,9 +222,27 @@ def generate_macro_html(data: dict, today_str: str) -> str:
     return cleaned
 
 
+def fetch_latest_index_html() -> str:
+    """Pull the freshest index.html straight from GitHub so we always
+    work from the latest version, avoiding push conflicts."""
+    import urllib.request
+    url = "https://raw.githubusercontent.com/Flamesjanagan/brookside-brief/main/index.html"
+    try:
+        with urllib.request.urlopen(url, timeout=15) as r:
+            content = r.read().decode("utf-8")
+        print("  Fetched latest index.html from GitHub.")
+        return content
+    except Exception as e:
+        print(f"  Warning: could not fetch from GitHub ({e}), using local copy.")
+        with open("index.html", "r", encoding="utf-8") as f:
+            return f.read()
+
+
 def update_html(new_macro_html: str, today_str: str, today_long: str) -> bool:
-    with open("index.html", "r", encoding="utf-8") as f:
-        content = f.read()
+    # Always start from the freshest remote version to avoid push conflicts
+    content = fetch_latest_index_html()
+    with open("index.html", "w", encoding="utf-8") as f:
+        f.write(content)
 
     # Replace macro tab panels
     pattern = r"<!-- MACRO-AUTO-START -->.*?<!-- MACRO-AUTO-END -->"
