@@ -178,6 +178,25 @@ The "up" and "dn" classes control colour (black vs red).
 Write like a confident Wall Street analyst. Use the real numbers from the data above. Be specific. Do not hedge with "may" or "could" — make a call."""
 
 
+def clean_html_output(raw: str) -> str:
+    """Strip code fences and any prose Claude adds around the HTML."""
+    text = raw.strip()
+    # Remove opening code fence (```html or ```)
+    text = re.sub(r"^```[a-zA-Z]*\n?", "", text)
+    # Remove closing code fence
+    text = re.sub(r"\n?```$", "", text)
+    text = text.strip()
+    # If Claude added explanation before the first <div, trim it
+    first_div = text.find('<div class="term-panel')
+    if first_div > 0:
+        text = text[first_div:]
+    # If Claude added explanation after the last </div>, trim it
+    last_div = text.rfind("</div>")
+    if last_div != -1:
+        text = text[:last_div + 6]
+    return text.strip()
+
+
 def generate_macro_html(data: dict, today_str: str) -> str:
     client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
     prompt = build_prompt(data, today_str)
@@ -185,10 +204,22 @@ def generate_macro_html(data: dict, today_str: str) -> str:
     msg = client.messages.create(
         model="claude-opus-4-5",
         max_tokens=4096,
-        system="You are a financial editor. Output only raw HTML — no markdown, no explanation, no code fences.",
+        system=(
+            "You are a financial editor. Output ONLY raw HTML div elements — "
+            "absolutely no markdown, no code fences, no explanation text before or after. "
+            "Start your response with '<div' and end it with '</div>'."
+        ),
         messages=[{"role": "user", "content": prompt}],
     )
-    return msg.content[0].text.strip()
+    raw = msg.content[0].text
+    cleaned = clean_html_output(raw)
+
+    # Safety check — if we don't have valid-looking output, raise so the
+    # workflow fails loudly rather than silently corrupting the page.
+    if not cleaned.startswith("<div"):
+        raise ValueError(f"Claude returned unexpected output (first 200 chars): {cleaned[:200]}")
+
+    return cleaned
 
 
 def update_html(new_macro_html: str, today_str: str, today_long: str) -> bool:
