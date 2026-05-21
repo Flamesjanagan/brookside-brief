@@ -36,4 +36,6 @@ jobs:
           git add index.html
           # Only commit if something actually changed
           git diff --staged --quiet || git commit -m "Daily macro update: $(date -u '+%Y-%m-%d')"
+          # Pull any changes pushed by the user since checkout, then push
+          git pull --rebase origin main
           git push
