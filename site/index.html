@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Brookside Brief</title>
+<style>
+  :root{
+    --ink:#111111;
+    --paper:#ffffff;
+    --paper-warm:#fbfbf9;
+    --rule:#111111;
+    --rule-soft:#dcdcd6;
+    --rule-softer:#ececea;
+    --red:#c8102e;
+    --red-dark:#9c0c23;
+    --muted:#6b6b66;
+    --muted-light:#8c8c86;
+    --serif:Georgia,'Times New Roman',Times,serif;
+    --sans:'Helvetica Neue',Arial,Helvetica,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--serif);font-size:17px;line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px;}
+
+  /* ---------- Utility / dateline bar ---------- */
+  .utilbar{border-bottom:1px solid var(--ink);font-family:var(--sans);}
+  .utilbar .wrap{display:flex;justify-content:space-between;align-items:center;
+    font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+    padding-top:7px;padding-bottom:7px;}
+  .utilbar .edition strong{color:var(--ink);}
+  .utilbar .price{color:var(--red);font-weight:700;}
+
+  /* ---------- Masthead ---------- */
+  .masthead{text-align:center;padding:24px 0 14px;position:relative;}
+  .masthead .kicker{font-family:var(--sans);font-size:12px;letter-spacing:.45em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:2px;padding-left:.45em;}
+  .masthead h1{font-family:var(--serif);font-weight:700;letter-spacing:-.01em;
+    font-size:64px;line-height:.95;margin:0;}
+  .masthead h1 .brk{display:block;}
+  .masthead .accent{color:var(--red);}
+  .masthead .tagline{font-family:var(--sans);font-size:11.5px;letter-spacing:.32em;
+    text-transform:uppercase;color:var(--muted);margin-top:12px;}
+  .masthead .crest{width:92px;height:92px;display:block;margin:0 auto 8px;}
+  .masthead .chart-motif{position:absolute;top:40px;right:8px;width:120px;height:54px;opacity:.9;}
+  .rule-thick{border-top:3px solid var(--ink);border-bottom:1px solid var(--ink);height:4px;}
+  .rule-thin{border-top:1px solid var(--ink);}
+
+  /* ---------- Nav ---------- */
+  nav.mainnav{position:sticky;top:0;z-index:50;background:var(--paper);
+    border-bottom:2px solid var(--ink);}
+  nav.mainnav .wrap{display:flex;justify-content:center;gap:0;flex-wrap:wrap;}
+  nav.mainnav button{
+    font-family:var(--sans);font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;
+    background:none;border:none;border-bottom:3px solid transparent;
+    padding:14px 26px;margin:0;cursor:pointer;color:var(--ink);font-weight:600;
+    transition:border-color .15s,color .15s;}
+  nav.mainnav button:hover{color:var(--red);}
+  nav.mainnav button.active{border-bottom-color:var(--red);color:var(--ink);}
+
+  /* ---------- Section scaffolding ---------- */
+  .view{display:none;padding:30px 0 70px;animation:fade .25s ease;}
+  .view.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+  .sec-eyebrow{font-family:var(--sans);font-size:11px;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--red);font-weight:700;margin-bottom:6px;}
+  .sec-title{font-family:var(--serif);font-size:34px;font-weight:700;line-height:1.05;margin:0 0 4px;}
+  .sec-sub{font-family:var(--sans);font-size:13px;color:var(--muted);margin-bottom:18px;}
+  .hr-section{border:none;border-top:1px solid var(--ink);margin:0 0 22px;}
+
+  /* ---------- Morning brief: uploader ---------- */
+  .brief-toolbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;
+    justify-content:space-between;border:1px solid var(--rule-soft);
+    background:var(--paper-warm);padding:14px 16px;margin-bottom:26px;}
+  .brief-toolbar .left{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .brief-toolbar label.archlbl{font-family:var(--sans);font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--muted);}
+  select#archiveSelect{font-family:var(--sans);font-size:13px;padding:7px 10px;
+    border:1px solid var(--ink);background:#fff;color:var(--ink);max-width:330px;}
+  .btn{font-family:var(--sans);font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+    font-weight:600;border:1px solid var(--ink);background:var(--ink);color:#fff;
+    padding:9px 16px;cursor:pointer;transition:background .15s,color .15s;}
+  .btn:hover{background:var(--red);border-color:var(--red);}
+  .btn.ghost{background:#fff;color:var(--ink);}
+  .btn.ghost:hover{background:var(--ink);color:#fff;}
+  .btn.danger:hover{background:var(--red);border-color:var(--red);color:#fff;}
+  .dropzone{border:2px dashed var(--rule-soft);text-align:center;padding:26px 18px;
+    margin-bottom:26px;color:var(--muted);font-family:var(--sans);font-size:13px;
+    transition:border-color .15s,background .15s;cursor:pointer;}
+  .dropzone.drag{border-color:var(--red);background:#fdf3f4;color:var(--red-dark);}
+  .dropzone strong{color:var(--ink);}
+  .dropzone.drag strong{color:var(--red-dark);}
+  #uploadStatus{font-family:var(--sans);font-size:12.5px;margin:-14px 0 22px;min-height:18px;}
+  #uploadStatus.ok{color:#111;}
+  #uploadStatus.err{color:var(--red);}
+
+  /* ---------- Brief article rendering ---------- */
+  article.brief{}
+  article.brief .doc-hd{text-align:center;border-bottom:1px solid var(--ink);
+    padding-bottom:14px;margin-bottom:8px;}
+  article.brief .doc-hd .t{font-family:var(--serif);font-size:30px;font-weight:700;}
+  article.brief .doc-hd .s{font-family:var(--serif);font-style:italic;color:var(--muted);font-size:16px;}
+  article.brief .doc-hd .d{font-family:var(--sans);font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--red);font-weight:700;margin-top:6px;}
+  article.brief h2{font-family:var(--sans);font-size:13px;letter-spacing:.16em;text-transform:uppercase;
+    font-weight:700;border-bottom:2px solid var(--ink);padding-bottom:5px;margin:34px 0 14px;}
+  article.brief h2 .num{color:var(--red);margin-right:8px;}
+  article.brief h3{font-family:var(--serif);font-size:21px;font-weight:700;line-height:1.2;
+    margin:22px 0 6px;}
+  article.brief p{margin:0 0 14px;}
+  article.brief .lede::first-letter{font-family:var(--serif);font-weight:700;float:left;
+    font-size:62px;line-height:.74;padding:6px 10px 0 0;color:var(--red);}
+  article.brief .stories{column-count:1;}
+  article.brief ul{padding-left:20px;margin:0 0 14px;}
+  article.brief .signoff{font-family:var(--sans);font-size:11px;letter-spacing:.06em;
+    color:var(--muted);text-transform:uppercase;border-top:1px solid var(--ink);
+    margin-top:30px;padding-top:14px;text-align:center;}
+
+  /* uploaded (mammoth) content gets baseline styling */
+  .uploaded-body p strong:only-child{display:block;font-family:var(--sans);font-size:13px;
+    letter-spacing:.14em;text-transform:uppercase;margin-top:24px;}
+  .uploaded-body table{border-collapse:collapse;width:100%;margin:0 0 18px;font-family:var(--sans);font-size:13px;}
+  .uploaded-body td,.uploaded-body th{border-bottom:1px solid var(--rule-softer);padding:6px 8px;text-align:left;}
+
+  /* ---------- Data tables ---------- */
+  .tbl-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-bottom:8px;}
+  table.mkt{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:13.5px;
+    margin-bottom:22px;}
+  table.mkt caption{text-align:left;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--muted);font-weight:700;padding-bottom:6px;border-bottom:2px solid var(--ink);margin-bottom:0;}
+  table.mkt th{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+    text-align:right;padding:8px 6px;border-bottom:1px solid var(--rule-soft);font-weight:600;}
+  table.mkt th:first-child{text-align:left;}
+  table.mkt td{padding:8px 6px;border-bottom:1px solid var(--rule-softer);text-align:right;
+    font-variant-numeric:tabular-nums;}
+  table.mkt td:first-child{text-align:left;font-family:var(--serif);font-size:15px;}
+  table.mkt tr:last-child td{border-bottom:none;}
+  .up{color:var(--ink);font-weight:700;}
+  .dn{color:var(--red);font-weight:700;}
+  .flag{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--red);font-weight:700;}
+
+  /* ---------- Macro terminal ---------- */
+  .term-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+  .term-tabs button{font-family:var(--sans);font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+    font-weight:600;border:1px solid var(--ink);background:#fff;color:var(--ink);padding:9px 18px;cursor:pointer;}
+  .term-tabs button.active{background:var(--ink);color:#fff;}
+  .term-tabs button:hover{border-color:var(--red);color:var(--red);}
+  .term-tabs button.active:hover{color:#fff;background:var(--red);border-color:var(--red);}
+  .term-panel{display:none;}
+  .term-panel.active{display:block;animation:fade .2s ease;}
+  .ai-answer{border-left:3px solid var(--red);background:var(--paper-warm);padding:16px 20px;
+    margin-bottom:24px;font-size:16px;line-height:1.6;}
+  .ai-answer .label{font-family:var(--sans);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
+    color:var(--red);font-weight:700;display:block;margin-bottom:6px;}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;margin-bottom:26px;}
+  .card{border:1px solid var(--rule-soft);padding:14px 16px;background:#fff;}
+  .card .clabel{font-family:var(--sans);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:8px;}
+  .card .cval{font-family:var(--serif);font-size:30px;font-weight:700;line-height:1;}
+  .card .cchg{font-family:var(--sans);font-size:12.5px;font-weight:700;margin-top:6px;}
+  .card .cnote{font-family:var(--sans);font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.4;}
+  .term-narr{font-family:var(--serif);font-size:15.5px;line-height:1.6;}
+  .term-narr h4{font-family:var(--sans);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    border-bottom:1px solid var(--ink);padding-bottom:5px;margin:24px 0 12px;}
+  .term-narr p{margin:0 0 13px;}
+
+  /* ---------- Stock picks ---------- */
+  .picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;}
+  .pick{border:1px solid var(--rule-soft);border-top:3px solid var(--ink);padding:16px 18px;background:#fff;}
+  .pick.bear{border-top-color:var(--red);}
+  .pick .phead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px;}
+  .pick .tick{font-family:var(--serif);font-size:26px;font-weight:700;}
+  .pick .stance{font-family:var(--sans);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    font-weight:700;padding:3px 8px;border:1px solid var(--ink);}
+  .pick.bear .stance{color:#fff;background:var(--red);border-color:var(--red);}
+  .pick.bull .stance{color:#fff;background:var(--ink);}
+  .pick.watch .stance{color:var(--ink);background:#fff;}
+  .pick .co{font-family:var(--sans);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:10px;}
+  .pick .pxrow{display:flex;gap:14px;align-items:baseline;border-top:1px solid var(--rule-softer);
+    border-bottom:1px solid var(--rule-softer);padding:9px 0;margin-bottom:11px;}
+  .pick .px{font-family:var(--serif);font-size:22px;font-weight:700;}
+  .pick .pchg{font-family:var(--sans);font-size:13px;font-weight:700;}
+  .pick .thesis{font-size:14.5px;line-height:1.5;}
+  .pick .pt{font-family:var(--sans);font-size:11.5px;color:var(--muted);margin-top:10px;
+    border-top:1px dotted var(--rule-soft);padding-top:9px;}
+  .pick .pt strong{color:var(--ink);}
+  .pick{position:relative;}
+  .pick-delwrap{text-align:right;margin-top:12px;}
+  .pick-del{font-family:var(--sans);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    border:1px solid var(--rule-soft);background:#fff;color:var(--muted);padding:4px 9px;cursor:pointer;}
+  .pick-del:hover{border-color:var(--red);color:var(--red);}
+
+  /* custom pick builder */
+  .pickbuilder{border:1px solid var(--rule-soft);border-top:3px solid var(--red);
+    background:var(--paper-warm);padding:16px 18px;margin-bottom:8px;}
+  .pb-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+  .pb-title{font-family:var(--serif);font-size:22px;margin:0;font-weight:700;}
+  .pb-title .small{font-family:var(--sans);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);display:block;font-weight:400;margin-top:2px;}
+  .pick-form{margin-top:16px;border-top:1px solid var(--rule-soft);padding-top:16px;}
+  .pf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;}
+  .pick-form label{display:block;font-family:var(--sans);font-size:10.5px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);}
+  .pick-form input,.pick-form select,.pick-form textarea{display:block;width:100%;margin-top:5px;
+    padding:8px 9px;border:1px solid var(--rule-soft);font-family:var(--sans);font-size:13px;
+    color:var(--ink);background:#fff;text-transform:none;letter-spacing:normal;}
+  .pick-form textarea{font-family:var(--serif);font-size:14px;resize:vertical;}
+  .pf-full{margin-top:12px;}
+  .pf-actions{margin-top:16px;display:flex;gap:10px;}
+  .pb-empty{font-family:var(--sans);font-size:13px;color:var(--muted);margin:12px 0 0;}
+  .pb-divider{display:flex;align-items:center;gap:14px;margin:28px 0 18px;font-family:var(--sans);
+    font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);}
+  .pb-divider::before,.pb-divider::after{content:"";flex:1;border-top:1px solid var(--ink);}
+  #customPicks:empty{display:none;}
+  #customPicks{margin-top:18px;}
+
+  .disclaimer{font-family:var(--sans);font-size:11px;color:var(--muted-light);line-height:1.5;
+    border-top:1px solid var(--rule-soft);margin-top:34px;padding-top:16px;}
+
+  footer.site{border-top:3px solid var(--ink);margin-top:40px;padding:22px 0 50px;}
+  footer.site .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;
+    font-family:var(--sans);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+  footer.site .accent{color:var(--red);}
+
+  @media(max-width:760px){
+    .masthead h1{font-size:42px;}
+    .masthead .chart-motif{display:none;}
+    .tbl-grid{grid-template-columns:1fr;gap:0;}
+    nav.mainnav button{padding:12px 14px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ UTILITY BAR ============ -->
+<div class="utilbar">
+  <div class="wrap">
+    <div class="edition"><strong>MORNING EDITION</strong> &nbsp;·&nbsp; <span id="dateline">Wednesday, May 20, 2026</span></div>
+    <div class="price">30-YR UST 5.19% &nbsp;·&nbsp; <span style="color:var(--muted)">VIX 21.6</span></div>
+  </div>
+</div>
+
+<!-- ============ MASTHEAD ============ -->
+<header class="masthead">
+  <div class="wrap" style="position:relative;">
+    <svg class="chart-motif" viewBox="0 0 120 54" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <polyline points="2,46 18,40 30,43 44,30 56,34 70,20 84,25 100,9 116,4"
+        fill="none" stroke="#c8102e" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+      <circle cx="116" cy="4" r="3.2" fill="#c8102e"/>
+      <line x1="0" y1="52" x2="120" y2="52" stroke="#111" stroke-width="1"/>
+    </svg>
+    <svg class="crest" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The Brookside Brief — badger mascot">
+      <!-- ears -->
+      <path d="M30,33 L26,9 L49,25 Z" fill="#111"/>
+      <path d="M90,33 L94,9 L71,25 Z" fill="#111"/>
+      <path d="M34,28 L33,16 L43,25 Z" fill="#fff"/>
+      <path d="M86,28 L87,16 L77,25 Z" fill="#fff"/>
+      <!-- white head -->
+      <path d="M60,20
+               C43,20 31,31 27,49
+               C24,64 29,83 44,94
+               C50,99 56,102 60,103
+               C64,102 70,99 76,94
+               C91,83 96,64 93,49
+               C89,31 77,20 60,20 Z" fill="#fff" stroke="#111" stroke-width="2.5"/>
+      <!-- signature black eye-stripes (the badger mask) -->
+      <path d="M53,25 C47,42 45,62 49,84 L40,86 C34,62 36,40 44,24 Z" fill="#111"/>
+      <path d="M67,25 C73,42 75,62 71,84 L80,86 C86,62 84,40 76,24 Z" fill="#111"/>
+      <!-- furrowed angry brow wedges -->
+      <path d="M52,30 L61,41 L57,30 Z" fill="#111"/>
+      <path d="M68,30 L59,41 L63,30 Z" fill="#111"/>
+      <!-- fierce red eyes (the splash of red) -->
+      <path d="M40,52 L50,48 L47,57 L39,58 Z" fill="#c8102e"/>
+      <path d="M80,52 L70,48 L73,57 L81,58 Z" fill="#c8102e"/>
+      <!-- black nose -->
+      <path d="M60,74 C54,74 51,80 55,84 C57,86 63,86 65,84 C69,80 66,74 60,74 Z" fill="#111"/>
+      <!-- snarl fangs -->
+      <path d="M54,90 L56,98 L59,91 Z" fill="#fff"/>
+      <path d="M66,90 L64,98 L61,91 Z" fill="#fff"/>
+    </svg>
+    <div class="kicker">The</div>
+    <h1><span class="brk">BROOKSIDE</span><span class="brk accent">BRIEF</span></h1>
+    <div class="tagline">Equities &nbsp;·&nbsp; Macro &nbsp;·&nbsp; Crypto &nbsp;·&nbsp; Markets</div>
+  </div>
+</header>
+<div class="rule-thick"></div>
+
+<!-- ============ NAV ============ -->
+<nav class="mainnav">
+  <div class="wrap">
+    <button class="nav-btn active" data-view="brief">Morning Brief</button>
+    <button class="nav-btn" data-view="macro">Macro Terminal</button>
+    <button class="nav-btn" data-view="picks">Stock Picks</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- ============================================================ -->
+  <!-- VIEW: MORNING BRIEF -->
+  <!-- ============================================================ -->
+  <section id="view-brief" class="view active">
+    <div class="sec-eyebrow">The Morning Brief</div>
+    <h2 class="sec-title">Today's Briefing</h2>
+    <p class="sec-sub">Delivered every morning at 9:30 AM ET. Upload tomorrow's edition below — it is rendered instantly and saved to your archive.</p>
+    <hr class="hr-section">
+
+    <div class="brief-toolbar">
+      <div class="left">
+        <label class="archlbl" for="archiveSelect">Archive</label>
+        <select id="archiveSelect"></select>
+      </div>
+      <div class="left">
+        <button class="btn" id="uploadBtn">Upload New Brief</button>
+        <button class="btn ghost danger" id="deleteBtn" title="Remove the selected uploaded brief">Delete</button>
+        <input type="file" id="fileInput" accept=".docx" style="display:none">
+      </div>
+    </div>
+
+    <div class="dropzone" id="dropzone">
+      Drag &amp; drop a <strong>.docx</strong> brief here, or <strong>click to browse</strong>.
+      Files named <em>brookside-brief-YYYY-MM-DD.docx</em> are dated automatically.
+    </div>
+    <div id="uploadStatus"></div>
+
+    <div id="briefContent"><!-- rendered brief injected here --></div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- VIEW: MACRO TERMINAL -->
+  <!-- ============================================================ -->
+  <section id="view-macro" class="view">
+    <div class="sec-eyebrow">Macro Terminal</div>
+    <h2 class="sec-title">The Macro Read</h2>
+    <p class="sec-sub">A terminal-style snapshot of the five forces moving markets — synced to today's brief, May 20, 2026.</p>
+    <hr class="hr-section">
+
+    <div class="term-tabs">
+      <button class="term-btn active" data-tab="overview">Overview</button>
+      <button class="term-btn" data-tab="rates">Rates</button>
+      <button class="term-btn" data-tab="inflation">Inflation</button>
+      <button class="term-btn" data-tab="growth">Growth</button>
+      <button class="term-btn" data-tab="risk">Risk</button>
+    </div>
+
+    <!-- OVERVIEW -->
+    <div class="term-panel active" id="tab-overview">
+      <div class="ai-answer">
+        <span class="label">The one-line read</span>
+        A still-humming earnings story is colliding with a bond market repricing the entire cost of capital.
+        The 30-year Treasury yield sits at a 19-year high of 5.19%, the S&amp;P closed down a third straight session
+        at 7,353.61, and the whole tape is holding its breath for Nvidia's after-the-bell verdict on the AI capex cycle.
+      </div>
+      <div class="cards">
+        <div class="card"><div class="clabel">S&amp;P 500</div><div class="cval">7,353.61</div><div class="cchg dn">▼ 0.67% &nbsp;(−49.44)</div><div class="cnote">Third straight down session; futures +0.40% pre-open.</div></div>
+        <div class="card"><div class="clabel">Nasdaq Composite</div><div class="cval">25,870.71</div><div class="cchg dn">▼ 0.84% &nbsp;(−220.02)</div><div class="cnote">Megacap growth under rate pressure.</div></div>
+        <div class="card"><div class="clabel">Dow Industrials</div><div class="cval">49,363.88</div><div class="cchg dn">▼ 0.65% &nbsp;(−322.24)</div><div class="cnote">Broad de-risking ahead of NVDA.</div></div>
+        <div class="card"><div class="clabel">UST 30-Year</div><div class="cval">5.19%</div><div class="cchg dn">▲ 7 bps &nbsp;<span class="flag">19-yr high</span></div><div class="cnote">Highest since July 2007; the dominant macro force.</div></div>
+        <div class="card"><div class="clabel">WTI Crude</div><div class="cval">$102.40</div><div class="cchg dn">▼ 0.68%</div><div class="cnote">Stabilizing as Iran diplomacy limps on.</div></div>
+        <div class="card"><div class="clabel">Bitcoin</div><div class="cval">$77,150</div><div class="cchg dn">▼ 1.62%</div><div class="cnote">Risk-off bid in the dollar weighs.</div></div>
+      </div>
+      <div class="term-narr">
+        <p>Markets have an unusually pure narrative today: a single company reporting after a single bell will signal whether the defining
+        investment theme of the decade is intact. But the quieter, more important story is in the bond market, where the 30-year just hit a
+        level unseen in nineteen years and fund managers are openly discussing 6%.</p>
+      </div>
+    </div>
+
+    <!-- RATES -->
+    <div class="term-panel" id="tab-rates">
+      <div class="ai-answer">
+        <span class="label">Rates read</span>
+        The curve is bear-steepening hard. The long bond at 5.19% is a 19-year high, the 2s30s spread has widened to 80 bps
+        (steepest since 2021), and fed funds futures now price a 41% chance of a hike by December. A weak $16B 20-year auction at 1:00 PM
+        could push the long end higher still.
+      </div>
+      <div class="cards">
+        <div class="card"><div class="clabel">UST 2-Year</div><div class="cval">4.39%</div><div class="cchg dn">▲ 3 bps</div><div class="cnote">Front end repricing hike odds.</div></div>
+        <div class="card"><div class="clabel">UST 10-Year</div><div class="cval">4.67%</div><div class="cchg dn">▲ 7 bps</div><div class="cnote">Benchmark grinding higher.</div></div>
+        <div class="card"><div class="clabel">UST 30-Year</div><div class="cval">5.19%</div><div class="cchg dn">▲ 7 bps &nbsp;<span class="flag">19-yr high</span></div><div class="cnote">Highest since July 2007.</div></div>
+        <div class="card"><div class="clabel">2s30s Spread</div><div class="cval">80 bps</div><div class="cchg dn">▲ steepest since 2021</div><div class="cnote">Classic bear-steepening.</div></div>
+        <div class="card"><div class="clabel">Hike Odds by Dec</div><div class="cval">41%</div><div class="cchg dn">▲ from 12% a month ago</div><div class="cnote">~100% priced by March 2027.</div></div>
+        <div class="card"><div class="clabel">30-Yr Mortgage</div><div class="cval">7.91%</div><div class="cchg dn">▲ cycle high</div><div class="cnote">Pressuring housing and homebuilders.</div></div>
+      </div>
+      <div class="term-narr">
+        <h4>What to watch</h4>
+        <p>Powell opens the Atlanta Fed conference at 9:00 AM — his first remarks since the hot CPI/PPI prints. Tomorrow's FOMC minutes
+        (2:00 PM) are the bigger event, revealing how deep the four-way dissent ran. The German 10-year Bund climbed to 2.78% in sympathy,
+        confirming this is a global repricing, not a U.S.-only story.</p>
+      </div>
+    </div>
+
+    <!-- INFLATION -->
+    <div class="term-panel" id="tab-inflation">
+      <div class="ai-answer">
+        <span class="label">Inflation read</span>
+        The April prints reignited the inflation fear: CPI at +3.8% Y/Y and PPI at a hot +6.0% Y/Y, much of it energy-driven.
+        A BofA fund manager survey out this morning shows 62% expect the 30-year yield to eventually reach 6% — a level last seen in 1999.
+      </div>
+      <div class="cards">
+        <div class="card"><div class="clabel">U.S. CPI (Apr, Y/Y)</div><div class="cval">3.8%</div><div class="cchg dn">▲ above target</div><div class="cnote">Hot print upended the rate outlook.</div></div>
+        <div class="card"><div class="clabel">U.S. PPI (Apr, Y/Y)</div><div class="cval">6.0%</div><div class="cchg dn">▲ energy-led</div><div class="cnote">Pipeline pressure building.</div></div>
+        <div class="card"><div class="clabel">UK CPI (Apr, Y/Y)</div><div class="cval">3.3%</div><div class="cchg dn">▲ vs 3.2% est</div><div class="cnote">Global stickiness narrative.</div></div>
+        <div class="card"><div class="clabel">Survey: 30Y → 6%</div><div class="cval">62%</div><div class="cchg dn">▲ of managers agree</div><div class="cnote">Last at 6% in 1999.</div></div>
+      </div>
+      <div class="term-narr">
+        <h4>The mechanism</h4>
+        <p>The market is desperate for signal on whether the Committee views the energy-driven surge as transitory or structural.
+        With the long bond already at a 19-year high, the bond market is effectively front-running a hawkish read. The equity risk
+        premium has compressed to its thinnest since 2002 as a result.</p>
+      </div>
+    </div>
+
+    <!-- GROWTH -->
+    <div class="term-panel" id="tab-growth">
+      <div class="ai-answer">
+        <span class="label">Growth read</span>
+        The hard data is still resilient. Roughly 95% of the S&amp;P 500 has reported Q1 with blended earnings growth of +11.4%
+        and 76% beating on EPS. The rate-sensitive consumer is bending but not breaking — Lowe's and Home Depot both beat. Friday's
+        flash PMIs are the first real test of whether the rate and energy shock is finally crimping growth.
+      </div>
+      <div class="cards">
+        <div class="card"><div class="clabel">S&amp;P Q1 EPS Growth</div><div class="cval">+11.4%</div><div class="cchg up">▲ blended, 95% reported</div><div class="cnote">76% beating on EPS.</div></div>
+        <div class="card"><div class="clabel">Japan Q1 GDP</div><div class="cval">+2.1%</div><div class="cchg up">▲ annualized</div><div class="cnote">Keeps a June BoJ hike on the table.</div></div>
+        <div class="card"><div class="clabel">Flash PMI — Mfg</div><div class="cval">49.2</div><div class="cchg dn">▼ sub-50 (Fri est)</div><div class="cnote">Contraction watch.</div></div>
+        <div class="card"><div class="clabel">Flash PMI — Svc</div><div class="cval">51.3</div><div class="cchg up">▲ expansion (Fri est)</div><div class="cnote">Services still carrying growth.</div></div>
+        <div class="card"><div class="clabel">Lowe's Comps</div><div class="cval">+0.6%</div><div class="cchg up">▲ online +15.5%</div><div class="cnote">Home-improvement demand stabilizing.</div></div>
+        <div class="card"><div class="clabel">India Sensex (1M)</div><div class="cval">+2.0%</div><div class="cchg up">▲ EM outperformer</div><div class="cnote">Leading emerging markets.</div></div>
+      </div>
+      <div class="term-narr">
+        <h4>The pivot point</h4>
+        <p>A genuine growth scare is the one development that would reliably reverse the relentless bond selloff — which is why Friday's
+        flash PMIs and any softening in the labor data suddenly matter more than they have in months. Walmart on Thursday closes the
+        consumer trifecta (consensus $0.66 / $171B).</p>
+      </div>
+    </div>
+
+    <!-- RISK -->
+    <div class="term-panel" id="tab-risk">
+      <div class="ai-answer">
+        <span class="label">Risk read</span>
+        Event risk is concentrated. The VIX jumped 5.9% to 21.6, Nvidia's options imply a ±7.2% move (≈$250B of market cap),
+        and the equity risk premium is the thinnest since 2002. A 6% long bond eventually breaks something — housing, leveraged credit,
+        or the equity multiple itself.
+      </div>
+      <div class="cards">
+        <div class="card"><div class="clabel">VIX</div><div class="cval">21.6</div><div class="cchg dn">▲ 5.9% (+1.2)</div><div class="cnote">Volatility bid into the print.</div></div>
+        <div class="card"><div class="clabel">NVDA Implied Move</div><div class="cval">±7.2%</div><div class="cchg dn">▲ ≈$250B mcap</div><div class="cnote">Single-name event with index consequences.</div></div>
+        <div class="card"><div class="clabel">Equity Risk Premium</div><div class="cval">2002 low</div><div class="cchg dn">▼ thinnest in 24 yrs</div><div class="cnote">Stocks barely out-yield bonds.</div></div>
+        <div class="card"><div class="clabel">20-Yr Auction</div><div class="cval">$16B</div><div class="cchg dn">1:00 PM demand test</div><div class="cnote">Weak result lifts the long end further.</div></div>
+        <div class="card"><div class="clabel">Brent Tail Risk</div><div class="cval">$115</div><div class="cchg dn">▲ if Iran talks collapse</div><div class="cnote">Strait of Hormuz partially restricted.</div></div>
+      </div>
+      <div class="term-narr">
+        <h4>The asymmetry</h4>
+        <p>Semiconductors carry ~11% of S&amp;P 500 weight; a 7% Nvidia move is worth roughly 30 index points on its own before sympathy
+        moves in AMD, Broadcom and the hyperscalers. Tonight we learn about the numerator (earnings). The denominator — the discount rate,
+        sitting at 5.19% and climbing — is the part that should keep you up at night.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- VIEW: STOCK PICKS -->
+  <!-- ============================================================ -->
+  <section id="view-picks" class="view">
+    <div class="sec-eyebrow">Stock Picks</div>
+    <h2 class="sec-title">Stocks to Watch</h2>
+    <p class="sec-sub">The names driving today's tape, with the brief's thesis and the analyst calls behind the move.</p>
+    <hr class="hr-section">
+
+    <!-- Custom pick builder -->
+    <div class="pickbuilder">
+      <div class="pb-head">
+        <h3 class="pb-title">Your Picks<span class="small">Build your own calls in the same format · saved to this browser</span></h3>
+        <button class="btn" id="togglePickForm">Add a Pick</button>
+      </div>
+      <form id="pickForm" class="pick-form" hidden>
+        <div class="pf-grid">
+          <label>Ticker<input id="pf-tick" maxlength="16" placeholder="NVDA" autocomplete="off"></label>
+          <label>Company · Sector<input id="pf-co" placeholder="Nvidia Corp · Semiconductors" autocomplete="off"></label>
+          <label>Stance
+            <select id="pf-stance">
+              <option value="bull">Bullish</option>
+              <option value="bear">Bearish</option>
+              <option value="watch">Watch</option>
+              <option value="catalyst">Catalyst</option>
+            </select>
+          </label>
+          <label>Price<input id="pf-px" placeholder="$224.00" autocomplete="off"></label>
+          <label>Change<input id="pf-chg" placeholder="+1.6% pre-mkt" autocomplete="off"></label>
+          <label>Direction
+            <select id="pf-dir">
+              <option value="up">Up / positive</option>
+              <option value="dn">Down / negative</option>
+              <option value="flat">Neutral</option>
+            </select>
+          </label>
+        </div>
+        <label class="pf-full">Thesis<textarea id="pf-thesis" rows="3" placeholder="Why you like (or dislike) it — the setup, catalyst, levels to watch…"></textarea></label>
+        <label class="pf-full">Target / note (optional)<input id="pf-note" placeholder="Targets: Melius $275 · Cantor $260" autocomplete="off"></label>
+        <div class="pf-actions">
+          <button type="submit" class="btn">Save Pick</button>
+          <button type="button" class="btn ghost" id="pf-cancel">Cancel</button>
+        </div>
+      </form>
+      <div class="picks" id="customPicks"></div>
+      <p id="customEmpty" class="pb-empty">No personal picks yet — click <strong>Add a Pick</strong> to create one in the same card format.</p>
+    </div>
+
+    <div class="pb-divider"><span>From Today's Brief</span></div>
+
+    <div class="picks">
+      <div class="pick bull">
+        <div class="phead"><span class="tick">NVDA</span><span class="stance">Catalyst</span></div>
+        <div class="co">Nvidia Corp · Semiconductors</div>
+        <div class="pxrow"><span class="px">$224.00</span><span class="pchg up">▲ 1.6% pre-mkt</span></div>
+        <div class="thesis">Reports after the close; options imply a ±7.2% move. Bull line is Q2 revenue guidance above $90B. Watch China H20 commentary and Blackwell gross margins.</div>
+        <div class="pt"><strong>Targets:</strong> Melius $275 (Street high) · Cantor $260 · Morgan Stanley $245</div>
+      </div>
+
+      <div class="pick watch">
+        <div class="phead"><span class="tick">TGT</span><span class="stance">Squeeze setup</span></div>
+        <div class="co">Target Corp · Consumer Retail</div>
+        <div class="pxrow"><span class="px">Pre-open</span><span class="pchg up">±8.5% implied</span></div>
+        <div class="thesis">Reports before the open into washed-out sentiment, elevated short interest, and a low bar (down 22% YTD). A clean print plus reaffirmed guidance is the recipe for a relief rally.</div>
+        <div class="pt"><strong>Guide:</strong> Q1 EPS ~$1.30 · FY EPS $7.50–$8.50</div>
+      </div>
+
+      <div class="pick bull">
+        <div class="phead"><span class="tick">LOW</span><span class="stance">Bullish</span></div>
+        <div class="co">Lowe's Cos · Home Improvement</div>
+        <div class="pxrow"><span class="px">~+3%</span><span class="pchg up">▲ on the beat</span></div>
+        <div class="thesis">Beat with adj. EPS $3.03 on $23.1B sales; comps +0.6%, online +15.5%. Confirms the Home Depot read — the rate-sensitive consumer is bending, not breaking. Watch follow-through above $250.</div>
+        <div class="pt"><strong>Target:</strong> Citi reiterates Buy, $290 PT</div>
+      </div>
+
+      <div class="pick bull">
+        <div class="phead"><span class="tick">INTC</span><span class="stance">Bullish</span></div>
+        <div class="co">Intel Corp · Semiconductors</div>
+        <div class="pxrow"><span class="px">$115.58</span><span class="pchg up">▲ 4.8% pre-mkt</span></div>
+        <div class="thesis">Leading the chip rebound on foundry-order momentum. Evercore upgraded to In-Line. Part of a broad pre-Nvidia risk-on bid across the semis complex (SMH +2.2%).</div>
+        <div class="pt"><strong>Target:</strong> Evercore upgrade, $120 PT</div>
+      </div>
+
+      <div class="pick bull">
+        <div class="phead"><span class="tick">MU</span><span class="stance">Bullish</span></div>
+        <div class="co">Micron Technology · Memory</div>
+        <div class="pxrow"><span class="px">~+3.4%</span><span class="pchg up">▲ on upgrade</span></div>
+        <div class="thesis">KeyBanc raised to Overweight on HBM pricing power. A key Nvidia supply-chain proxy into tonight's print — high-bandwidth memory demand is the cleanest AI-capex read-through.</div>
+        <div class="pt"><strong>Rating:</strong> KeyBanc → Overweight</div>
+      </div>
+
+      <div class="pick bear">
+        <div class="phead"><span class="tick">DHI · LEN · PHM</span><span class="stance">Bearish</span></div>
+        <div class="co">Homebuilders · Housing</div>
+        <div class="pxrow"><span class="px">Under pressure</span><span class="pchg dn">▼ rate-driven</span></div>
+        <div class="thesis">The 30-year mortgage rate hit 7.91%, the cycle high, as the long bond spikes. Barclays trimmed targets across the group. Rate sensitivity makes these the cleanest short against the bond selloff.</div>
+        <div class="pt"><strong>Calls:</strong> Barclays cuts targets across DHI, LEN, PHM</div>
+      </div>
+
+      <div class="pick bear">
+        <div class="phead"><span class="tick">TLT</span><span class="stance">Bearish</span></div>
+        <div class="co">20+ Yr Treasury ETF · Rates</div>
+        <div class="pxrow"><span class="px">52-wk low</span><span class="pchg dn">▼ long-bond stress</span></div>
+        <div class="thesis">The single cleanest expression of long-bond stress, sitting at a fresh 52-week low. Watch the 1:00 PM 20-year auction for the next leg — a weak result sends the long end higher and TLT lower.</div>
+        <div class="pt"><strong>Catalyst:</strong> $16B 20-yr auction, 1:00 PM ET</div>
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      For informational purposes only and not investment advice. The Brookside Brief is not a registered investment adviser
+      or broker-dealer. Figures are drawn from the morning brief dated May 20, 2026 and reflect a point-in-time snapshot.
+      Do your own research and consult a licensed professional before trading.
+    </div>
+  </section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div>The <span class="accent">Brookside</span> Brief © 2026</div>
+    <div>Not bullish. Not bearish. <span class="accent">Badgerish.</span></div>
+    <div>Compiled 9:30 AM ET · Sources: WSJ, CNBC, Bloomberg, Reuters, BLS, U.S. Treasury</div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script>
+/* =====================================================================
+   THE BROOKSIDE BRIEF — client-side app
+   - Section nav + macro terminal tabs
+   - In-browser .docx uploader (mammoth.js) with localStorage archive
+   ===================================================================== */
+
+/* ---------- Default (built-in) brief: today's edition ---------- */
+const DEFAULT_BRIEF_ID = "default-2026-05-20";
+const DEFAULT_BRIEF = {
+  id: DEFAULT_BRIEF_ID,
+  date: "2026-05-20",
+  title: "The Brookside Brief — Wednesday, May 20, 2026",
+  builtIn: true,
+  kind: "styled",          // hand-built, already styled
+  html: ""                 // populated on init, once the <template> below has parsed
+};
+// Additional built-in archive editions (converted from .docx, rendered like uploads)
+const SEED_BRIEFS = [
+  { id:"seed-2026-05-19", date:"2026-05-19", title:"The Brookside Brief — Tuesday, May 19, 2026",  builtIn:true, kind:"mammoth", tplId:"seed-2026-05-19", html:"" },
+  { id:"seed-2026-05-18", date:"2026-05-18", title:"The Brookside Brief — Monday, May 18, 2026",   builtIn:true, kind:"mammoth", tplId:"seed-2026-05-18", html:"" }
+];
+
+/* ---------- Section navigation ---------- */
+document.querySelectorAll(".nav-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("view-"+btn.dataset.view).classList.add("active");
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+});
+
+/* ---------- Macro terminal tabs ---------- */
+document.querySelectorAll(".term-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".term-btn").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".term-panel").forEach(p=>p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("tab-"+btn.dataset.tab).classList.add("active");
+  });
+});
+
+/* ---------- Archive storage ---------- */
+const LS_KEY = "brookside_briefs_v1";
+function loadStored(){
+  try{ return JSON.parse(localStorage.getItem(LS_KEY)) || []; }
+  catch(e){ return []; }
+}
+function saveStored(arr){ localStorage.setItem(LS_KEY, JSON.stringify(arr)); }
+
+function allBriefs(){
+  // newest first by date; built-in editions + anything the user has uploaded
+  const stored = loadStored();
+  const combined = [DEFAULT_BRIEF, ...SEED_BRIEFS, ...stored];
+  return combined.sort((a,b)=> (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+}
+
+// Strip the repeated masthead lines (title / subtitle / date) from converted
+// .docx HTML so the synthetic header isn't duplicated.
+function stripMasthead(html){
+  const tmp = document.createElement("div");
+  tmp.innerHTML = html;
+  let removed = 0;
+  while(tmp.firstElementChild && removed < 4){
+    const el = tmp.firstElementChild;
+    const t = (el.textContent || "").trim();
+    const isMast = /brookside\s+brief/i.test(t)
+      || /morning briefing on markets/i.test(t)
+      || /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)/i.test(t) && /\d{4}/.test(t) && t.length < 60;
+    if(isMast){ el.remove(); removed++; } else { break; }
+  }
+  return tmp.innerHTML;
+}
+
+function fmtDate(iso){
+  const d = new Date(iso+"T12:00:00");
+  if(isNaN(d)) return iso;
+  return d.toLocaleDateString("en-US",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+}
+
+/* ---------- Render ---------- */
+function renderBrief(id){
+  const brief = allBriefs().find(b=>b.id===id) || allBriefs()[0];
+  const container = document.getElementById("briefContent");
+  if(!brief){ container.innerHTML = "<p>No brief loaded.</p>"; return; }
+  if(brief.kind === "styled"){
+    container.innerHTML = brief.html;           // hand-built, already styled
+  }else{
+    container.innerHTML =
+      '<article class="brief"><div class="doc-hd"><div class="t">The Brookside Brief</div>'
+      + '<div class="s">A morning briefing on markets, macro, and the day ahead</div>'
+      + '<div class="d">'+fmtDate(brief.date)+' · 9:30 AM ET</div></div>'
+      + '<div class="uploaded-body">'+stripMasthead(brief.html)+'</div></article>';
+  }
+  // sync select + delete button state
+  document.getElementById("archiveSelect").value = brief.id;
+  document.getElementById("deleteBtn").disabled = !!brief.builtIn;
+  document.getElementById("deleteBtn").style.opacity = brief.builtIn ? .4 : 1;
+}
+
+function refreshArchiveSelect(selectId){
+  const sel = document.getElementById("archiveSelect");
+  sel.innerHTML = "";
+  allBriefs().forEach(b=>{
+    const o = document.createElement("option");
+    o.value = b.id;
+    o.textContent = fmtDate(b.date) + (b.builtIn ? "  (sample)" : "");
+    sel.appendChild(o);
+  });
+  if(selectId) sel.value = selectId;
+}
+document.getElementById("archiveSelect").addEventListener("change",e=>renderBrief(e.target.value));
+
+/* ---------- Date detection ---------- */
+function detectDate(filename, text){
+  let m = (filename||"").match(/(\d{4})-(\d{2})-(\d{2})/);
+  if(m) return m[1]+"-"+m[2]+"-"+m[3];
+  // try "Month DD, YYYY" inside the document
+  m = (text||"").match(/(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}),\s+(\d{4})/i);
+  if(m){
+    const months={january:1,february:2,march:3,april:4,may:5,june:6,july:7,august:8,september:9,october:10,november:11,december:12};
+    const mm=String(months[m[1].toLowerCase()]).padStart(2,"0");
+    const dd=String(m[2]).padStart(2,"0");
+    return m[3]+"-"+mm+"-"+dd;
+  }
+  return new Date().toISOString().slice(0,10);
+}
+
+/* ---------- Upload handling ---------- */
+const fileInput = document.getElementById("fileInput");
+const dropzone  = document.getElementById("dropzone");
+const statusEl  = document.getElementById("uploadStatus");
+
+function setStatus(msg, kind){ statusEl.textContent = msg; statusEl.className = kind||""; }
+
+function handleFile(file){
+  if(!file){ return; }
+  if(!file.name.toLowerCase().endsWith(".docx")){
+    setStatus("Please choose a .docx file (Word document).","err"); return;
+  }
+  if(typeof mammoth === "undefined"){
+    setStatus("The .docx converter could not load (it needs an internet connection the first time). Today's brief still works offline.","err");
+    return;
+  }
+  setStatus("Converting "+file.name+" …","ok");
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    mammoth.convertToHtml({arrayBuffer: ev.target.result})
+      .then(function(result){
+        const html = result.value;
+        const tmp = document.createElement("div"); tmp.innerHTML = html;
+        const text = tmp.textContent || "";
+        const date = detectDate(file.name, text);
+        const stored = loadStored();
+        const id = "up-" + date + "-" + Date.now();
+        // replace any existing stored brief with the same date
+        const filtered = stored.filter(b=>b.date !== date);
+        filtered.push({id, date, title:"Brookside Brief — "+date, html, savedAt:new Date().toISOString()});
+        saveStored(filtered);
+        refreshArchiveSelect(id);
+        renderBrief(id);
+        setStatus("Saved “"+file.name+"” to your archive for "+fmtDate(date)+".","ok");
+      })
+      .catch(function(err){
+        setStatus("Could not read that file: "+err.message,"err");
+      });
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+document.getElementById("uploadBtn").addEventListener("click",()=>fileInput.click());
+dropzone.addEventListener("click",()=>fileInput.click());
+fileInput.addEventListener("change",e=>{ if(e.target.files[0]) handleFile(e.target.files[0]); fileInput.value=""; });
+
+["dragenter","dragover"].forEach(ev=>dropzone.addEventListener(ev,e=>{e.preventDefault();dropzone.classList.add("drag");}));
+["dragleave","drop"].forEach(ev=>dropzone.addEventListener(ev,e=>{e.preventDefault();dropzone.classList.remove("drag");}));
+dropzone.addEventListener("drop",e=>{ const f=e.dataTransfer.files[0]; if(f) handleFile(f); });
+
+/* ---------- Delete ---------- */
+document.getElementById("deleteBtn").addEventListener("click",()=>{
+  const id = document.getElementById("archiveSelect").value;
+  if(id === DEFAULT_BRIEF_ID){ return; }
+  const stored = loadStored().filter(b=>b.id !== id);
+  saveStored(stored);
+  refreshArchiveSelect();
+  renderBrief(allBriefs()[0].id);
+  setStatus("Brief removed from your archive.","ok");
+});
+
+/* ---------- Custom stock picks ---------- */
+const PICKS_KEY = "brookside_picks_v1";
+function loadPicks(){ try{ return JSON.parse(localStorage.getItem(PICKS_KEY)) || []; }catch(e){ return []; } }
+function savePicks(a){ localStorage.setItem(PICKS_KEY, JSON.stringify(a)); }
+function esc(s){ return (s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
+const STANCE_MAP = {
+  bull:{tone:"bull",label:"Bullish"}, bear:{tone:"bear",label:"Bearish"},
+  watch:{tone:"watch",label:"Watch"}, catalyst:{tone:"bull",label:"Catalyst"}
+};
+
+function renderCustomPicks(){
+  const wrap = document.getElementById("customPicks");
+  const empty = document.getElementById("customEmpty");
+  if(!wrap) return;
+  const picks = loadPicks();
+  wrap.innerHTML = picks.map(p=>{
+    const sm = STANCE_MAP[p.stance] || STANCE_MAP.watch;
+    const dir = p.dir === "up" ? "up" : p.dir === "dn" ? "dn" : "";
+    return '<div class="pick '+sm.tone+'">'
+      + '<div class="phead"><span class="tick">'+esc(p.ticker)+'</span><span class="stance">'+esc(sm.label)+'</span></div>'
+      + '<div class="co">'+esc(p.company || "Your pick")+'</div>'
+      + '<div class="pxrow"><span class="px">'+esc(p.price || "—")+'</span><span class="pchg '+dir+'">'+esc(p.change || "")+'</span></div>'
+      + '<div class="thesis">'+esc(p.thesis || "")+'</div>'
+      + (p.note ? '<div class="pt">'+esc(p.note)+'</div>' : "")
+      + '<div class="pick-delwrap"><button class="pick-del" data-id="'+esc(p.id)+'">Remove</button></div>'
+      + '</div>';
+  }).join("");
+  if(empty) empty.style.display = picks.length ? "none" : "block";
+  wrap.querySelectorAll(".pick-del").forEach(b=>b.addEventListener("click",()=>{
+    savePicks(loadPicks().filter(x=>x.id !== b.dataset.id));
+    renderCustomPicks();
+  }));
+}
+
+(function wirePickForm(){
+  const form = document.getElementById("pickForm");
+  if(!form) return;
+  const toggle = document.getElementById("togglePickForm");
+  toggle.addEventListener("click",()=>{
+    form.hidden = !form.hidden;
+    if(!form.hidden) document.getElementById("pf-tick").focus();
+  });
+  document.getElementById("pf-cancel").addEventListener("click",()=>{ form.hidden = true; form.reset(); });
+  form.addEventListener("submit",e=>{
+    e.preventDefault();
+    const ticker = document.getElementById("pf-tick").value.trim();
+    if(!ticker){ document.getElementById("pf-tick").focus(); return; }
+    const pick = {
+      id:"pk-"+Date.now(),
+      ticker: ticker.toUpperCase(),
+      company: document.getElementById("pf-co").value.trim(),
+      stance: document.getElementById("pf-stance").value,
+      price: document.getElementById("pf-px").value.trim(),
+      change: document.getElementById("pf-chg").value.trim(),
+      dir: document.getElementById("pf-dir").value,
+      thesis: document.getElementById("pf-thesis").value.trim(),
+      note: document.getElementById("pf-note").value.trim()
+    };
+    const arr = loadPicks(); arr.unshift(pick); savePicks(arr);
+    form.reset(); form.hidden = true; renderCustomPicks();
+  });
+})();
+
+/* ---------- Init (after DOM fully parsed so the <template> exists) ---------- */
+function init(){
+  const tpl = document.getElementById("seed-template");
+  DEFAULT_BRIEF.html = tpl ? tpl.innerHTML : "<p>Today's brief could not load.</p>";
+  SEED_BRIEFS.forEach(b=>{
+    const t = document.getElementById(b.tplId);
+    b.html = t ? t.innerHTML : "<p>This edition could not load.</p>";
+  });
+  renderCustomPicks();
+  refreshArchiveSelect();
+  renderBrief(allBriefs()[0].id);
+}
+if(document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", init);
+}else{
+  init();
+}
+</script>
+
+<template id="seed-2026-05-19"><p><strong>THE BROOKSIDE BRIEF</strong></p><p><em>A morning briefing on markets, macro, and the day ahead</em></p><p><strong>Tuesday, May 19, 2026  •  9:30 AM ET</strong></p><p><strong>1. THE MORNING SETUP</strong></p><p>Good morning. The market opens Tuesday with a fascinating split-screen: oil and bonds have blinked, but equities haven't fully figured out what to do with it. President Trump's overnight decision to call off a 'scheduled attack of Iran tomorrow' — following private appeals from Saudi Arabia, Qatar, and the UAE — has knocked WTI back through $103 and pulled Brent toward $107. The Strait of Hormuz remains restricted but a handful of tankers have resumed transit. It is the first material de-escalation signal in six weeks.</p><p>And yet — the 30-year Treasury yield closed Friday at 5.12%, above the psychologically important 5% line for the first time since October 2023. Yesterday's session was telling: the Dow eked out a 160-point gain on energy and defensives, but the Nasdaq sagged another 0.51% as chip stocks continued to bleed ahead of tomorrow's Nvidia print. The S&amp;P 500 closed essentially flat at 7,403.05 — a stalemate between the oil-relief bid and the rates-pain trade.</p><p>This morning's tape is mixed. Home Depot reported pre-open and beat: $3.43 EPS vs. $3.41 estimated, $41.77B revenue vs. $41.52B, comparable sales up 0.6% (versus flat consensus), and crucially management reaffirmed full-year guidance. The print removes one tail risk for the housing-sensitive complex but doesn't change the bigger picture: rates are still elevated, Nvidia tomorrow night is still the binary, and the FOMC minutes Thursday will tell us how much patience this Fed has left.</p><p><strong>2. MARKETS AT A GLANCE</strong></p><p><strong>U.S. Equity Futures (pre-open)</strong></p><table><tr><td><p><strong>Asset</strong></p></td><td><p><strong>Last</strong></p></td><td><p><strong>Change</strong></p></td><td><p><strong>% Chg</strong></p></td></tr><tr><td><p>S&amp;P 500 (ES)</p></td><td><p>7,381</p></td><td><p>-22</p></td><td><p>-0.30%</p></td></tr><tr><td><p>Nasdaq 100 (NQ)</p></td><td><p>25,665</p></td><td><p>-155</p></td><td><p>-0.60%</p></td></tr><tr><td><p>Dow (YM)</p></td><td><p>49,610</p></td><td><p>-77</p></td><td><p>-0.20%</p></td></tr><tr><td><p>Russell 2000 (RTY)</p></td><td><p>2,234</p></td><td><p>-4</p></td><td><p>-0.18%</p></td></tr></table><p><strong>Prior Close (Monday, May 18)</strong></p><table><tr><td><p><strong>Asset</strong></p></td><td><p><strong>Last</strong></p></td><td><p><strong>Change</strong></p></td><td><p><strong>% Chg</strong></p></td></tr><tr><td><p>S&amp;P 500</p></td><td><p>7,403.05</p></td><td><p>-5.45</p></td><td><p>-0.07%</p></td></tr><tr><td><p>Nasdaq Composite</p></td><td><p>26,090.73</p></td><td><p>-134.41</p></td><td><p>-0.51%</p></td></tr><tr><td><p>Dow Jones Industrial Avg.</p></td><td><p>49,686.12</p></td><td><p>+159.95</p></td><td><p>+0.32%</p></td></tr><tr><td><p>Russell 2000</p></td><td><p>2,238.05</p></td><td><p>-3.25</p></td><td><p>-0.15%</p></td></tr><tr><td><p>VIX</p></td><td><p>20.4</p></td><td><p>+0.6</p></td><td><p>+3.0%</p></td></tr></table><p><strong>Rates &amp; FX</strong></p><table><tr><td><p><strong>Asset</strong></p></td><td><p><strong>Last</strong></p></td><td><p><strong>Change</strong></p></td><td><p><strong>% Chg</strong></p></td></tr><tr><td><p>UST 2-Year</p></td><td><p>4.36%</p></td><td><p>+2 bps</p></td><td><p>—</p></td></tr><tr><td><p>UST 10-Year</p></td><td><p>4.60%</p></td><td><p>-3 bps</p></td><td><p>—</p></td></tr><tr><td><p>UST 30-Year</p></td><td><p>5.12%</p></td><td><p>+16 bps</p></td><td><p>—</p></td></tr><tr><td><p>DXY (Dollar Index)</p></td><td><p>99.18</p></td><td><p>-0.21</p></td><td><p>-0.21%</p></td></tr><tr><td><p>EUR/USD</p></td><td><p>1.0742</p></td><td><p>+0.0030</p></td><td><p>+0.28%</p></td></tr><tr><td><p>USD/JPY</p></td><td><p>158.20</p></td><td><p>-1.20</p></td><td><p>-0.75%</p></td></tr></table><p><strong>Commodities &amp; Crypto</strong></p><table><tr><td><p><strong>Asset</strong></p></td><td><p><strong>Last</strong></p></td><td><p><strong>Change</strong></p></td><td><p><strong>% Chg</strong></p></td></tr><tr><td><p>WTI Crude (Jun)</p></td><td><p>$103.10</p></td><td><p>-$3.55</p></td><td><p>-3.33%</p></td></tr><tr><td><p>Brent Crude (Jul)</p></td><td><p>$106.85</p></td><td><p>-$3.27</p></td><td><p>-2.97%</p></td></tr><tr><td><p>Gold (spot)</p></td><td><p>$1,762</p></td><td><p>+$12</p></td><td><p>+0.69%</p></td></tr><tr><td><p>Silver (spot)</p></td><td><p>$20.32</p></td><td><p>+$0.27</p></td><td><p>+1.35%</p></td></tr><tr><td><p>Bitcoin</p></td><td><p>$78,420</p></td><td><p>+$1,515</p></td><td><p>+1.97%</p></td></tr></table><p><strong>Asia &amp; Europe</strong></p><table><tr><td><p><strong>Asset</strong></p></td><td><p><strong>Last</strong></p></td><td><p><strong>Change</strong></p></td><td><p><strong>% Chg</strong></p></td></tr><tr><td><p>Nikkei 225</p></td><td><p>Closed (Holiday)</p></td><td><p>—</p></td><td><p>—</p></td></tr><tr><td><p>Hang Seng</p></td><td><p>21,080</p></td><td><p>-70</p></td><td><p>-0.33%</p></td></tr><tr><td><p>Australia ASX 200</p></td><td><p>8,478</p></td><td><p>-27</p></td><td><p>-0.32%</p></td></tr><tr><td><p>Stoxx Europe 600</p></td><td><p>557.20</p></td><td><p>+1.80</p></td><td><p>+0.32%</p></td></tr><tr><td><p>FTSE 100</p></td><td><p>8,695</p></td><td><p>-25</p></td><td><p>-0.29%</p></td></tr><tr><td><p>DAX</p></td><td><p>19,920</p></td><td><p>+80</p></td><td><p>+0.40%</p></td></tr></table><p><strong>3. TOP STORIES</strong></p><p><strong>Trump Calls Off Iran Strike After Gulf-State Appeals — Oil Cracks $103</strong></p><p>In a Monday-evening post, President Trump confirmed he had 'shelved' a scheduled Tuesday strike on Iran following requests from the leaders of Saudi Arabia, Qatar, and the UAE, calling the diplomatic track 'very serious now.' Iran has not confirmed any breakthrough, but a handful of tankers — including a Vietnamese-bound Iraqi cargo — have resumed transit through the Strait of Hormuz overnight. Oil markets reacted swiftly: WTI for June delivery tumbled 3.3% to $103.10, its biggest single-session decline since the crisis began on February 28. Brent is back near $107. Energy equities are giving back roughly 4% pre-market, with E&amp;P names (FANG, EOG, PXD) leading the unwind.</p><p><strong>30-Year Yield Punches Through 5% — First Time Since October 2023</strong></p><p>Friday's 30-year settle at 5.12% and Monday's hold at the same level mark a meaningful regime change. The last time the long bond traded above 5% on a sustained basis (October 2023), it preceded a 10% S&amp;P 500 drawdown over six weeks. The proximate driver is now well-known — hot CPI/PPI prints, oil-driven inflation premium, Fed dissents — but the second-order effect is what's interesting: 30-year mortgage rates have climbed to 7.85%, ten-year corporate spreads have widened 18 basis points in two weeks, and the iShares 20+ Year Treasury ETF (TLT) is at a new 52-week low. Watch tomorrow's $16B 20-year auction at 1:00 p.m. ET — a tail of more than 2 basis points would be ugly.</p><p><strong>Home Depot Beats, Reaffirms Guide — Housing Read Less Dire Than Feared</strong></p><p>Home Depot's Q1 print this morning came in better than the bears had positioned for. EPS of $3.43 cleared the $3.41 estimate; revenue of $41.77 billion topped $41.52 billion consensus. Comparable sales rose 0.6% globally and 0.4% in the U.S. — the first positive comp number in three quarters. Customer transactions fell 1.3% but average ticket rose 2.3% to $92.76. CFO Richard McPhail told the call that pro-customer demand has 'stabilized' and spring categories are tracking 'in line with plan.' Management reaffirmed full-year guidance of 2.5–4.5% sales growth and flat-to-+2% comps. HD is indicated up 2.4% pre-market. Lowe's (LOW) reports Wednesday before open; the read-through is incrementally positive but not definitive — Lowe's pro mix is half of HD's.</p><p><strong>Nvidia Tonight Tomorrow: Pre-Print Positioning at Extremes</strong></p><p>Nvidia trades at $229.72 in the pre-market this morning after closing $220.35 yesterday — a 4% lift that is being attributed to fresh sell-side flow defending the position into the Wednesday-after-close print. Implied move from options chains: ±7.4%. Open interest has shifted dramatically over the past 72 hours toward the $240 strike on the call side and the $200 strike on the put side, creating what option desks are calling 'the biggest pin risk we've seen this year.' Cantor moved its PT to $260 this morning (from $220). The number that matters: Q2 FY27 revenue guidance. Below $87B is bad. Above $90B is great. In between is the most likely outcome, which makes the post-print read on operating margins and inventory the swing variable.</p><p><strong>Japan GDP Surprises — But Yen Strengthens on Risk-Off Rotation</strong></p><p>Japan's Q1 GDP printed +2.1% annualized overnight, comfortably above the +1.7% Reuters consensus and well clear of the prior +1.3% read. The upside surprise complicates the BoJ's messaging — Governor Ueda had spent the past six weeks talking down hike expectations on growth concerns. The yen rallied 75 basis points to 158.20 against the dollar, the strongest level in a month. The move was amplified by general dollar weakness as the Iran-strike cancellation pushed safe-haven flows out of greenbacks and back into euros and yen. Watch USD/JPY 157 as the line where Tokyo would more credibly be able to argue intervention is unwarranted.</p><p><strong>RBA Surprises with 25bp Hike — Australia's Inflation Fight Far From Over</strong></p><p>The Reserve Bank of Australia raised the cash rate to 4.35% from 4.10% overnight, against a market that had priced 60% probability of a hold. Governor Bullock's statement was hawkish in tone, noting 'persistent services inflation' and 'still-tight labor market conditions.' AUD/USD jumped 0.8% to 0.6618 on the print. The Australia decision is being watched as a potential template for what global central banks may have to do if the Hormuz-driven inflation impulse persists: confront the reality that 'transitory' is unraveling again.</p><p><strong>4. MACRO &amp; FED WATCH</strong></p><p>The week's marquee macro event remains Thursday's FOMC minutes from the April 28–29 meeting, where the Committee held the policy rate at 3.50–3.75% over a four-way dissent. Markets will be hunting two things in the minutes: first, the actual ideological split — Hammack and Logan reportedly pushed hard for a hike; second, any language change around 'longer-run inflation expectations remain anchored,' the linchpin sentence that has held the long end of the curve together. Powell speaks Wednesday at 9:00 a.m. at the Atlanta Fed conference; expect anything other than a strict reiteration of the April statement to move rates.</p><p>Fed funds futures are now pricing 38% probability of a hike by December, up from 12% one month ago. They are pricing 100% probability of a hike by March 2027. Two weeks ago, those numbers were 6% and 84%, respectively. The Iran-strike cancellation softens this trajectory at the margin — overnight, December-hike probability backed off from 42% to 38% — but the structural inflation question hasn't gone away just because Trump postponed an attack.</p><p><strong>5. ECONOMIC CALENDAR — REST OF WEEK</strong></p><table><tr><td><p><strong>Day</strong></p></td><td><p><strong>Time (ET)</strong></p></td><td><p><strong>Release</strong></p></td><td><p><strong>Consensus</strong></p></td></tr><tr><td><p>Tue 5/19</p></td><td><p>Before open</p></td><td><p>Home Depot (HD) Q1 — BEAT ✓</p></td><td><p>Actual: $3.43 / $41.77B</p></td></tr><tr><td><p>Tue 5/19</p></td><td><p>After close</p></td><td><p>Palo Alto Networks (PANW) Q3</p></td><td><p>EPS $0.98 / Rev $2.40B</p></td></tr><tr><td><p>Wed 5/20</p></td><td><p>Before open</p></td><td><p>Lowe's (LOW), Target (TGT)</p></td><td><p>—</p></td></tr><tr><td><p>Wed 5/20</p></td><td><p>8:30 AM</p></td><td><p>Building Permits / Housing Starts (Apr)</p></td><td><p>1.44M / 1.36M</p></td></tr><tr><td><p>Wed 5/20</p></td><td><p>9:00 AM</p></td><td><p>Powell remarks — Atlanta Fed</p></td><td><p>—</p></td></tr><tr><td><p>Wed 5/20</p></td><td><p>1:00 PM</p></td><td><p>20-Yr Treasury auction ($16B)</p></td><td><p>—</p></td></tr><tr><td><p>Wed 5/20</p></td><td><p>After close</p></td><td><p>Nvidia (NVDA) Q1 FY27</p></td><td><p>EPS $1.77 / Rev $78.0B</p></td></tr><tr><td><p>Thu 5/21</p></td><td><p>8:30 AM</p></td><td><p>Initial Jobless Claims</p></td><td><p>228K</p></td></tr><tr><td><p>Thu 5/21</p></td><td><p>8:30 AM</p></td><td><p>Philly Fed Mfg. (May)</p></td><td><p>-2.0</p></td></tr><tr><td><p>Thu 5/21</p></td><td><p>Before open</p></td><td><p>Walmart (WMT) Q1</p></td><td><p>EPS $0.66 / Rev $171B</p></td></tr><tr><td><p>Thu 5/21</p></td><td><p>10:00 AM</p></td><td><p>Existing Home Sales (Apr)</p></td><td><p>4.10M</p></td></tr><tr><td><p>Thu 5/21</p></td><td><p>2:00 PM</p></td><td><p>FOMC Minutes (Apr 28–29)</p></td><td><p>—</p></td></tr><tr><td><p>Fri 5/22</p></td><td><p>9:45 AM</p></td><td><p>S&amp;P Global Flash PMIs (May)</p></td><td><p>Mfg 49.2 / Svc 51.3</p></td></tr></table><p><strong>6. EARNINGS WATCH</strong></p><p>Home Depot's morning beat sets a constructive tone for the consumer cohort reporting this week. The big read-through: rate-sensitive durables demand is bending but not breaking. Average ticket up 2.3% suggests some pricing power; transactions down 1.3% says the elasticity is real. For Lowe's tomorrow morning, the bar just got slightly higher — Street consensus of -1.5% comps now looks beatable. For Target Wednesday before open, the bar remains very low given the −22% YTD share-price performance; a clean print plus stable guidance is the setup for a 6–8% relief rally. Palo Alto Networks reports after close tonight; consensus is $0.98 / $2.40B. The bigger question for PANW is the NGS billings update — investors want to see deceleration arrest after two consecutive quarters of disappointment.</p><p>Walmart Thursday is the marquee retail print of the week. Consensus is $0.66 / $171B. The ex-fuel U.S. comp consensus is +3.86%. Watch the e-commerce / advertising revenue split: WMT's Connect ad business is now running at a $4B annualized clip and is the most defensible narrative for further multiple expansion. Approximately 94% of the S&amp;P 500 has now reported Q1; blended growth sits at +11.4% with 76% beating EPS estimates.</p><p><strong>7. SECTOR SPOTLIGHT: DEFENSIVES VS. CYCLICALS</strong></p><p>Yesterday's tape was a small but instructive preview. With the Dow up 32 bps and the Nasdaq down 51, the relative-performance gap between defensives (utilities, staples, healthcare) and growth (megacap tech, semis, software) was the widest one-day spread since the August 2024 carry-trade unwind. Year-to-date, utilities are +14%, staples +9%, healthcare +7%, while the Nasdaq 100 is flat on the year. This rotation pattern is consistent with what we'd expect in a 'higher-rates plus geopolitical stress' regime — but it has happened with remarkably little broader-market drama, which is itself notable.</p><p>Within energy, the Iran-strike cancellation is going to create a sorting exercise this morning. The cleanest sells are the second-derivative beneficiaries (tankers, LNG) that have priced in maximal Hormuz disruption. The cleanest holds are the integrated majors (XOM, CVX) whose free-cash-flow stories don't depend on $110 Brent. The cleanest buys, if the de-escalation proves head-fake, are the same pure-play E&amp;Ps that are giving back 4% this morning.</p><p><strong>8. ANALYST CALLS DRIVING ACTION</strong></p><p>Notable upgrades / target hikes: Cantor lifted Nvidia (NVDA) PT to $260 from $220 ahead of tomorrow's print, citing 'Hyperscaler capex commitments are tracking ahead of our model.' Citi upgraded Home Depot (HD) to Buy with a $385 PT post-earnings (from Neutral / $340). JPMorgan raised Costco (COST) to Overweight, citing 'membership pricing power that the market continues to underestimate.' Wells Fargo upgraded ConocoPhillips (COP) to Overweight with a $145 PT on Permian capital discipline.</p><p>Notable downgrades / target cuts: HSBC was hit with multiple PT cuts (UBS, Barclays, JPM) after its Q1 results disappointed on net interest margin compression. Wedbush cut Tesla (TSLA) PT to $290 from $340, maintaining Neutral. Morgan Stanley moved Lululemon (LULU) to Equal-Weight from Overweight on China weakness. Goldman trimmed Apple (AAPL) PT to $235 from $250 on India tariff uncertainty.</p><p><strong>9. STOCKS TO WATCH</strong></p><p>Nvidia (NVDA) — Pre-market $229.72 vs. yesterday's close of $220.35. The setup matters more than the level: option pin risk is concentrated at $240 (calls) and $200 (puts). Earnings tomorrow after close.</p><p>Home Depot (HD) — Up 2.4% pre-market on the beat. Watch the $345 resistance from late April; a clean break opens room to $360.</p><p>ExxonMobil (XOM) / Chevron (CVX) — Both giving back 1.5–2% on the oil pullback but holding the 50-day MA. These are the cleanest defensives in the energy complex if Hormuz tension reignites.</p><p>Diamondback Energy (FANG) / EOG — Off 4% pre-market on the de-escalation trade. Watch for stabilization at the 200-day MA; below that and the next bid is air.</p><p>Palo Alto (PANW) — Reports tonight. Implied move ±9.2%. NGS billings are the key.</p><p>HSBC (HSBC) — Down 4% in London after disappointing NIM print. Read-through to other global banks (Standard Chartered, Barclays) was modest but worth monitoring.</p><p>Toyota (TM) / Honda (HMC) — Beneficiaries of weaker dollar / stronger yen overnight; both up 1–2% in ADR pre-market on the Japan GDP surprise.</p><p><strong>10. GLOBAL MACRO SNAPSHOT</strong></p><p>Europe: Stoxx 600 modestly higher led by autos and chemicals on the oil pullback; London lagging on HSBC's results. UK April CPI tomorrow at 7:00 a.m. ET — consensus 3.2% Y/Y. ECB's Lagarde speaks Thursday at the Brussels Forum.</p><p>Asia: Japan, mainland China, and South Korea all closed for holidays overnight, thinning liquidity. Hong Kong's Hang Seng down 0.3% on tech weakness; the Australia ASX 200 fell 32 bps after the surprise RBA hike. Japan's Q1 GDP +2.1% annualized — strong upside surprise.</p><p>Emerging markets: The dollar's overnight retreat is providing some breathing room for EM currencies — the Brazilian real, Mexican peso, and Indian rupee all up 30–50 bps versus the greenback. Turkey holds rates Thursday; consensus is for an unchanged 50% benchmark.</p><p><strong>11. WEEK AHEAD PREVIEW</strong></p><p>The setup into the back half of the week is now framed by two competing forces. On the dovish-for-equities side: oil falling, dollar softer, Hormuz tensions easing. On the hawkish-for-equities side: 30-year at 5.12%, FOMC minutes Thursday that could confirm internal hike pressure, and a Nvidia print that has to be perfect to extend rather than puncture the AI narrative.</p><p>Three set-piece events to focus on: (1) Powell at 9:00 a.m. Wednesday — any departure from the April statement language moves the front end; (2) Nvidia tomorrow after close — Q2 guidance above $90B reignites the AI trade, below $87B triggers a de-rating; (3) FOMC minutes Thursday 2:00 p.m. — if the dissents read as deeper than the statement suggested, the long bond probably tests 5.25%.</p><p><strong>12. THE CLOSING THOUGHT</strong></p><p><em>Six weeks of inflation panic and Middle East escalation have produced what is, in the end, still a fairly orderly market: the S&amp;P 500 is essentially flat on the year, the VIX is at 20, credit spreads are wide but not screaming. Yesterday gave us the first hint that the marginal trade may be turning: oil and bonds both blinked. The puzzle now is whether equities can rotate sustainably — defensives outperforming, but with a real bid coming back into the growth complex — or whether the 30-year above 5% simply caps any rally regardless of what oil does. We will have a much better answer to that question 36 hours from now, after Nvidia speaks and the FOMC reveals its hand. Trade it carefully.</em></p><p><em>— The Brookside Brief  •  Compiled 9:30 AM ET  •  Sources: WSJ, CNBC, Bloomberg, Reuters, Yahoo Finance, TradingEconomics, S&amp;P Global, BLS, U.S. Treasury —</em></p></template>
+<template id="seed-2026-05-18"><p><strong>THE BROOKSIDE BRIEF</strong></p><p><em>A morning briefing on markets, macro, and the day ahead</em></p><p><strong>Monday, May 18, 2026  •  9:30 AM ET</strong></p><p><strong>1. THE MORNING SETUP</strong></p><p>Good morning. Wall Street walks into Monday nursing a hangover and bracing for a stress test. Friday's session shaved 1.24% off the S&amp;P 500 and 1.54% off the Nasdaq as tech buckled under a renewed climb in long-end yields and the abrupt deflation of the Trump–Xi summit, which broke up without the trade breakthroughs traders had begun to price in over the prior two weeks. Futures are flickering between gains and losses pre-bell, with the path of least resistance tied to two unrelated stories that have suddenly become the same story: oil at $110 and Nvidia at 5:00 p.m. Wednesday.</p><p>The Strait of Hormuz remains closed for a sixth straight week. President Trump's overnight warning that 'the clock is ticking' on Iran sent Brent briefly above $111 in Asia before easing on a report — sourced to Iranian state media — that Washington had floated a temporary sanctions waiver pending a broader deal. Vice President Vance is in Islamabad today leading the next round of talks. Until the strait reopens, the energy bid stays sticky and so does the inflation print every desk on the Street is now modeling for May.</p><p>The macro backdrop is unforgiving. April CPI ran at 3.8% year-on-year and PPI at 6.0% — the hottest producer-side print since late 2022. Fed funds futures have completed an extraordinary round trip: from pricing two cuts in January to fully pricing a hike by Q1 2027, with a better-than-one-in-three chance of one before year-end. The 10-year sits at 4.63%, the dollar index at 99.39 — its highest in a month — and the policy-sensitive 2-year is grinding higher into Thursday's FOMC minutes from the April 28–29 hold, which markets will mine for any hint of how seriously Powell's committee is entertaining the H-word.</p><p><strong>2. MARKETS AT A GLANCE</strong></p><p><strong>U.S. Equity Futures (pre-open)</strong></p><table><tr><td><p><strong>Asset</strong></p></td><td><p><strong>Last</strong></p></td><td><p><strong>Change</strong></p></td><td><p><strong>% Chg</strong></p></td></tr><tr><td><p>S&amp;P 500 (ES)</p></td><td><p>7,415</p></td><td><p>+7</p></td><td><p>+0.09%</p></td></tr><tr><td><p>Nasdaq 100 (NQ)</p></td><td><p>25,840</p></td><td><p>-25</p></td><td><p>-0.10%</p></td></tr><tr><td><p>Dow (YM)</p></td><td><p>49,610</p></td><td><p>+85</p></td><td><p>+0.17%</p></td></tr><tr><td><p>Russell 2000 (RTY)</p></td><td><p>2,238</p></td><td><p>-3</p></td><td><p>-0.13%</p></td></tr></table><p><strong>Prior Close (Friday, May 15)</strong></p><table><tr><td><p><strong>Asset</strong></p></td><td><p><strong>Last</strong></p></td><td><p><strong>Change</strong></p></td><td><p><strong>% Chg</strong></p></td></tr><tr><td><p>S&amp;P 500</p></td><td><p>7,408.50</p></td><td><p>-92.92</p></td><td><p>-1.24%</p></td></tr><tr><td><p>Nasdaq Composite</p></td><td><p>26,225.14</p></td><td><p>-410.43</p></td><td><p>-1.54%</p></td></tr><tr><td><p>Dow Jones Industrial Avg.</p></td><td><p>49,526.17</p></td><td><p>-537.29</p></td><td><p>-1.07%</p></td></tr><tr><td><p>Russell 2000</p></td><td><p>2,241.30</p></td><td><p>-22.95</p></td><td><p>-1.01%</p></td></tr><tr><td><p>VIX</p></td><td><p>19.8</p></td><td><p>+2.4</p></td><td><p>+13.8%</p></td></tr></table><p><strong>Rates &amp; FX</strong></p><table><tr><td><p><strong>Asset</strong></p></td><td><p><strong>Last</strong></p></td><td><p><strong>Change</strong></p></td><td><p><strong>% Chg</strong></p></td></tr><tr><td><p>UST 2-Year</p></td><td><p>4.34%</p></td><td><p>+3 bps</p></td><td><p>—</p></td></tr><tr><td><p>UST 10-Year</p></td><td><p>4.63%</p></td><td><p>+4 bps</p></td><td><p>—</p></td></tr><tr><td><p>UST 30-Year</p></td><td><p>4.96%</p></td><td><p>+5 bps</p></td><td><p>—</p></td></tr><tr><td><p>DXY (Dollar Index)</p></td><td><p>99.39</p></td><td><p>+0.11</p></td><td><p>+0.11%</p></td></tr><tr><td><p>EUR/USD</p></td><td><p>1.0712</p></td><td><p>-0.0015</p></td><td><p>-0.14%</p></td></tr><tr><td><p>USD/JPY</p></td><td><p>159.40</p></td><td><p>+0.65</p></td><td><p>+0.41%</p></td></tr></table><p><strong>Commodities &amp; Crypto</strong></p><table><tr><td><p><strong>Asset</strong></p></td><td><p><strong>Last</strong></p></td><td><p><strong>Change</strong></p></td><td><p><strong>% Chg</strong></p></td></tr><tr><td><p>WTI Crude (Jun)</p></td><td><p>$106.65</p></td><td><p>+$1.23</p></td><td><p>+1.17%</p></td></tr><tr><td><p>Brent Crude (Jul)</p></td><td><p>$110.12</p></td><td><p>+$0.86</p></td><td><p>+0.79%</p></td></tr><tr><td><p>Gold (spot)</p></td><td><p>$1,750</p></td><td><p>-$18</p></td><td><p>-1.02%</p></td></tr><tr><td><p>Silver (spot)</p></td><td><p>$20.05</p></td><td><p>-$0.42</p></td><td><p>-2.05%</p></td></tr><tr><td><p>Bitcoin</p></td><td><p>$76,905</p></td><td><p>-$1,095</p></td><td><p>-1.41%</p></td></tr></table><p><strong>Asia &amp; Europe</strong></p><table><tr><td><p><strong>Asset</strong></p></td><td><p><strong>Last</strong></p></td><td><p><strong>Change</strong></p></td><td><p><strong>% Chg</strong></p></td></tr><tr><td><p>Nikkei 225</p></td><td><p>38,420</p></td><td><p>-310</p></td><td><p>-0.80%</p></td></tr><tr><td><p>Hang Seng</p></td><td><p>21,150</p></td><td><p>-265</p></td><td><p>-1.24%</p></td></tr><tr><td><p>Australia ASX 200</p></td><td><p>8,505.30</p></td><td><p>-125.20</p></td><td><p>-1.45%</p></td></tr><tr><td><p>Stoxx Europe 600</p></td><td><p>555.40</p></td><td><p>+3.30</p></td><td><p>+0.60%</p></td></tr><tr><td><p>FTSE 100</p></td><td><p>8,720</p></td><td><p>+45</p></td><td><p>+0.52%</p></td></tr><tr><td><p>DAX</p></td><td><p>19,840</p></td><td><p>+115</p></td><td><p>+0.58%</p></td></tr></table><p><strong>3. TOP STORIES</strong></p><p><strong>Hormuz Crisis Enters Week Six — Trump Warns Tehran 'Clock Is Ticking'</strong></p><p>Brent crude touched $111.40 in Asian trading after President Trump warned Iran via overnight post that 'there won't be anything left of them' if a deal isn't reached this week. Iranian state media countered with claims that Washington has offered a temporary sanctions waiver, which the State Department neither confirmed nor denied. Vice President Vance is in Islamabad today, with Pakistani mediation viewed as the last credible track before the two-week conditional ceasefire that began April 8 fully unravels. Roughly 20% of global seaborne oil — and a third of the world's LNG cargoes — would normally transit Hormuz; insurance rates for vessels still willing to attempt the passage are now five times pre-crisis levels. Energy desks are penciling another 75 cents on the May CPI energy component for every week the strait stays closed.</p><p><strong>Tech Selloff Resumes as 30-Year Yield Threatens 5%</strong></p><p>Friday's drubbing left the Nasdaq Composite 4.1% off its May 12 record close, with the Magnificent Seven shedding a combined $720 billion in market cap over two sessions. The proximate trigger was a 7-basis-point pop in the 30-year Treasury yield to 4.96% after the hotter-than-expected PPI report on Thursday, followed by hedge-fund deleveraging into Friday's OpEx. The 30-year is now within striking distance of the 5% line — a level that, when last breached in October 2023, marked the high-water mark of that cycle's bond rout. Watch the 1:00 p.m. ET 20-year auction Wednesday; a tail of more than 2 basis points would likely set off another round of duration-driven equity selling.</p><p><strong>Trump–Xi Summit Ends Without Breakthrough; Tariff Path Murky</strong></p><p>President Trump's three-day summit with President Xi concluded Friday morning in Beijing with no joint communiqué, no agreement on the December tariff cliff, and conspicuously cool body language at the closing photo op. Both sides agreed to 'continued dialogue,' which Wall Street translated into 'no deal.' The yuan weakened 0.4% against the dollar overnight. Semiconductor equipment names (AMAT, LRCX, KLAC) are indicated 1–2% lower pre-market on concerns the October export-control updates may be reapplied without the carve-outs that were briefly floated. China-exposed luxury and EV-supply-chain names also under pressure.</p><p><strong>Nvidia Earnings Wednesday: The Biggest Print of the Year</strong></p><p>Nvidia reports Q1 FY27 after Wednesday's close, with the Street looking for roughly $78 billion in revenue and $1.77 in non-GAAP EPS — implying a 78% top-line and 115% bottom-line growth rate. Data-center revenue consensus sits near $73 billion. The number that actually matters, per the buy-side notes circulating this morning, is Q2 FY27 guidance: anything below $87 billion would be a meaningful disappointment, while a Q2 print above $90 billion would almost certainly drag the Nasdaq off its post-Friday lows. Goldman reiterated its Buy rating and $250 price target overnight, citing 'meaningful undervaluation' versus historical multiples. Polymarket's implied probability of a beat sits at 90%.</p><p><strong>Hot CPI/PPI Combo Forces Fed Pivot Talk — to the Other Direction</strong></p><p>The April inflation pair released Tuesday and Wednesday last week did more to reset Fed expectations than any single data set since the pandemic. CPI's 0.6% monthly print was the hottest since January 2024; PPI's 1.4% monthly gain was the biggest one-month surge since early 2022. With the policy rate held at 3.50–3.75% on April 29 over four dissents (Hammack, Kashkari, Logan, plus one unannounced), markets are now assigning 36% probability to a 25-basis-point hike by December and 100% probability to a hike by March 2027. Goldman's Hatzius wrote over the weekend that 'the Committee's tolerance for above-target inflation has clearly narrowed,' and JPM's Feroli now expects a hike at the September meeting if Hormuz isn't reopened by July. Thursday's FOMC minutes from the April hold are the marquee read this week.</p><p><strong>Crypto Cracks: Bitcoin Tests $76K as Risk-Off Spreads</strong></p><p>Bitcoin slipped through $77,000 over the weekend and is changing hands near $76,900 this morning — down roughly 18% from its February high near $94K. The Crypto Fear &amp; Greed Index sits at 28, deep in 'fear' territory. Gold has been an even bigger casualty of the dollar's rally, with spot at $1,750 versus its January peak near $2,150. The simultaneous breakdown in BTC and gold is striking; both had been bid as inflation hedges through 2025 but are now trading as straight risk assets against a dollar wrecking-ball powered by the U.S. front-end yield advantage. ETF flows have been negative on BTC for nine consecutive sessions per Farside data, with IBIT seeing $920 million of outflows over that span.</p><p><strong>4. MACRO &amp; FED WATCH</strong></p><p>Powell speaks at the Atlanta Fed's financial markets conference Wednesday morning at 9:00 a.m. ET — three hours before Nvidia. Markets will be parsing his opening remarks for any departure from the April 29 statement language, which characterized inflation as 'elevated, in part reflecting the recent increase in global energy prices.' The 'in part' is doing heavy lifting there; if Powell drops the qualifier, the front-end will sell off hard.</p><p>Two regional bank heads dissented at April's meeting in favor of a hike (Hammack, Logan), and a third (Kashkari) wanted to keep the option of a hike on the table without acting. The April minutes Thursday afternoon will reveal whether Powell's two-paragraph statement masked a deeper split. Watch for any language change around 'longer-run inflation expectations remain anchored' — if that sentence weakens, the 30-year almost certainly takes out 5%.</p><p>Treasury auctions this week: $16B 20-year reopening Wednesday at 1:00 p.m. and $19B 10-year TIPS Thursday at 1:00 p.m. The TIPS auction is the more interesting print given the inflation narrative; a strong stop-through would suggest real-money buyers are positioning for the energy shock to extend, while a weak result would imply growing acceptance that the Fed will lean hawkish to defend the 2% target.</p><p><strong>5. ECONOMIC CALENDAR — WEEK OF MAY 18</strong></p><table><tr><td><p><strong>Day</strong></p></td><td><p><strong>Time (ET)</strong></p></td><td><p><strong>Release</strong></p></td><td><p><strong>Consensus</strong></p></td></tr><tr><td><p>Mon 5/18</p></td><td><p>10:00 AM</p></td><td><p>NAHB Housing Market Index (May)</p></td><td><p>34 (prior 34)</p></td></tr><tr><td><p>Tue 5/19</p></td><td><p>8:30 AM</p></td><td><p>Building Permits / Housing Starts (Apr)</p></td><td><p>1.44M / 1.36M</p></td></tr><tr><td><p>Tue 5/19</p></td><td><p>Before open</p></td><td><p>Home Depot (HD) Q1 earnings</p></td><td><p>EPS $3.62 / Rev $39.3B</p></td></tr><tr><td><p>Wed 5/20</p></td><td><p>9:00 AM</p></td><td><p>Powell remarks — Atlanta Fed</p></td><td><p>—</p></td></tr><tr><td><p>Wed 5/20</p></td><td><p>1:00 PM</p></td><td><p>20-Yr Treasury auction ($16B)</p></td><td><p>—</p></td></tr><tr><td><p>Wed 5/20</p></td><td><p>After close</p></td><td><p>Nvidia (NVDA) Q1 FY27 earnings</p></td><td><p>EPS $1.77 / Rev $78.0B</p></td></tr><tr><td><p>Wed 5/20</p></td><td><p>After close</p></td><td><p>Palo Alto Networks (PANW), Target (TGT)</p></td><td><p>—</p></td></tr><tr><td><p>Thu 5/21</p></td><td><p>8:30 AM</p></td><td><p>Initial Jobless Claims</p></td><td><p>228K</p></td></tr><tr><td><p>Thu 5/21</p></td><td><p>8:30 AM</p></td><td><p>Philly Fed Mfg. Index (May)</p></td><td><p>-2.0</p></td></tr><tr><td><p>Thu 5/21</p></td><td><p>10:00 AM</p></td><td><p>Existing Home Sales (Apr)</p></td><td><p>4.10M</p></td></tr><tr><td><p>Thu 5/21</p></td><td><p>Before open</p></td><td><p>Walmart (WMT) Q1 earnings</p></td><td><p>EPS $0.66 / Rev $171B</p></td></tr><tr><td><p>Thu 5/21</p></td><td><p>2:00 PM</p></td><td><p>FOMC Minutes (Apr 28–29)</p></td><td><p>—</p></td></tr><tr><td><p>Fri 5/22</p></td><td><p>9:45 AM</p></td><td><p>S&amp;P Global Flash PMIs (May)</p></td><td><p>Mfg 49.2 / Svc 51.3</p></td></tr></table><p><strong>6. EARNINGS WATCH</strong></p><p>It is, simply, Nvidia week. But under that elephant sits a quieter consumer story: the U.S. consumer's first real read since the spring inflation re-acceleration. Home Depot (Tuesday) is the canary on big-ticket, rate-sensitive discretionary; the comp consensus has crept down to 0.0% over the past month, and management's tone on housing turnover will matter more than the print itself. Walmart (Thursday) is the inverse trade — same-store sales ex-fuel expected at +3.86% — and any commentary about trade-down behavior in middle-income cohorts will move the entire staples complex. Target (Wednesday) carries the most beta into earnings; the stock is down 22% YTD and short interest is at a multi-year high.</p><p>Beyond retail, Palo Alto Networks Wednesday after close will set the tone for cyber spending into H2; consensus is $0.98 / $2.40B. Baidu Wednesday and Ryanair Monday round out the global calendar. Roughly 92% of the S&amp;P 500 has now reported Q1; blended growth sits at +11.2% with 76% beating EPS estimates — strong but increasingly priced in.</p><p><strong>7. SECTOR SPOTLIGHT: ENERGY EQUITIES</strong></p><p>Energy is the only S&amp;P 500 sector positive year-to-date, up 18.4%, versus the index at +2.1% and the Nasdaq 100 at -0.4%. The XLE is up 21% since the Hormuz crisis began in early April. Within the sector, the leadership has narrowed: integrated majors (XOM +14% YTD, CVX +11%) have lagged the pure-play E&amp;Ps (FANG +28%, PXD +24%, EOG +22%), while refiners have lagged the entire group as crack spreads compressed.</p><p>The setup for this week: if Hormuz reopens, expect a 5–8% one-day pullback across the sector, led by E&amp;Ps that have priced in the most term premium. If Hormuz stays closed and Brent breaks $115, the next leg is likely led by tankers (FRO, STNG, INSW) and LNG operators (CHK, LNG, TELL) rather than the producers, since term-structure backwardation now flatters near-month shipping economics dramatically. Goldman moved its 12-month Brent target to $115 from $98 on Friday afternoon.</p><p><strong>8. ANALYST CALLS DRIVING ACTION</strong></p><p>Notable upgrades / target hikes: Goldman Sachs reiterated Buy on Nvidia (NVDA) with a $250 PT, citing 'meaningful undervaluation' into earnings. BofA raised Nova Measuring Instruments (NVMI) PT to $612 from $510, keeping Buy. Truist lifted First Industrial Realty Trust (FR) to $67 from $66. Morgan Stanley upgraded ExxonMobil (XOM) to Overweight from Equal-Weight with a $145 PT, citing Permian capital discipline. Wells Fargo raised Palantir (PLTR) to Equal-Weight on AIP commercial traction.</p><p>Notable downgrades / target cuts: Jefferies cut Jack In The Box (JACK) to Underperform. HSBC reduced Eli Lilly (LLY) to Hold, citing GLP-1 competition. Argus reduced DraftKings (DKNG) to Hold on regulatory headwinds in three new states. Citi cut Home Depot (HD) PT to $340 from $370 ahead of earnings, maintaining Neutral. Barclays trimmed Target (TGT) PT to $98 from $112, also into the print.</p><p><strong>9. STOCKS TO WATCH</strong></p><p>Nvidia (NVDA): The week's anchor event. Watch the $108–$112 pre-earnings consolidation range; a break either way pre-print will be a tell. Implied move from options: ±7.4%.</p><p>Apple (AAPL): Reports last week were fine but the stock is back to flat on the year. Trump-Xi no-deal removes the China-thaw narrative and the WWDC keynote June 9 is now the next catalyst.</p><p>ExxonMobil (XOM) / Chevron (CVX): The cleanest Hormuz proxies. Both have decoupled from oil the past two sessions, suggesting either profit-taking or hedge-fund de-risking; either way, they screen for mean reversion if oil holds above $105.</p><p>Tesla (TSLA): Below the 200-day for the first time since November. China headwinds, no Robotaxi catalyst until June 12 unveiling, and Musk's overnight tweetstorm at the Trump-Xi communiqué won't help. Bears in control.</p><p>Palantir (PLTR): One of the few high-beta names that held up Friday (-0.4% vs. Nasdaq -1.5%). AIP commercial wins continue to underwrite the narrative; watch for follow-through if the broader tape stabilizes.</p><p>Boeing (BA): 737 MAX delivery numbers leaked over the weekend suggest April was the strongest month in two years. Could be a defensive industrial bid amid the geopolitical noise.</p><p>Home Depot (HD): Pre-earnings positioning is bearish. Implied move ±4.2%. A flat-to-positive comp print plus stable guidance could trigger a relief squeeze.</p><p><strong>10. GLOBAL MACRO SNAPSHOT</strong></p><p>Europe: The Stoxx 600 opened firmer on a defense-sector bid as the U.S.-Iran standoff continues to lift European primes (Rheinmetall, BAE, Leonardo). UK April CPI Wednesday is the marquee regional print; consensus 3.2% Y/Y. The ECB's Lagarde speaks Thursday at the Brussels Forum.</p><p>Asia: Japan's Q1 GDP printed -0.7% annualized overnight, weaker than the -0.4% consensus, raising fresh questions about the BoJ's June meeting (markets had priced one more hike this year). The yen drifted weaker to 159.40 versus the dollar on the print — within striking distance of MoF intervention thresholds. Chinese April retail sales were +4.1% Y/Y, in line, but industrial production missed at +5.9% vs. 6.4% expected.</p><p>Emerging markets: India's Sensex is up 2.1% over the past month, outperforming the EM complex as flows pivot away from Greater China. Brazil's CPI is Wednesday; the real has held up remarkably well versus the dollar's rally on commodity terms-of-trade tailwinds.</p><p><strong>11. WEEK AHEAD PREVIEW</strong></p><p>Three set-piece events frame the week:</p><p>(1) Wednesday 5:00 p.m. — Nvidia. Anything south of $87 billion in Q2 guidance is a problem for the AI trade and, by extension, for index leadership. Anything north of $90 billion likely reignites the chase into year-end.</p><p>(2) Thursday 2:00 p.m. — FOMC minutes. The market has done 75% of the Fed's heavy lifting in the past two weeks by repricing rate-hike probabilities. If the April minutes confirm that Powell's committee is more divided than the statement suggested, the rates complex extends its move. If the minutes lean dovish — emphasizing the temporary nature of the energy shock — duration finally gets a bid.</p><p>(3) Friday 9:45 a.m. — S&amp;P Global flash May PMIs. Manufacturing slipping back below 50 would be the first sign that the energy shock is actively crimping growth, complicating any hawkish Fed pivot.</p><p>Beyond the U.S., watch UK CPI Wednesday and Japan's national CPI Friday for confirmation that the global inflation re-acceleration is genuinely global rather than U.S.-centric.</p><p><strong>12. THE CLOSING THOUGHT</strong></p><p><em>Markets have spent the past three weeks discovering that 'higher for longer' has a sequel — and the sequel is called 'higher again.' The April CPI/PPI combination, the persistent oil bid, and a Fed split four ways on its next move have collapsed the dovish optionality that underpinned the spring rally. The remarkable thing is how orderly it has been so far. The S&amp;P 500 is still up 2% on the year. The VIX is still below 20. Credit spreads have widened less than 30 basis points. The story this week is whether that orderly repricing tips into something disorderly — and the two events most likely to determine the answer are a chip company's quarterly call on Wednesday afternoon and a set of meeting minutes Thursday at 2:00. It's a strange world. Trade it carefully.</em></p><p><em>— The Brookside Brief  •  Compiled 9:30 AM ET  •  Sources: WSJ, CNBC, Bloomberg, Reuters, Fortune, TradingEconomics, S&amp;P Global, BLS, U.S. Treasury —</em></p></template>
+<!-- =================== SEED TEMPLATE: today's brief =================== -->
+<template id="seed-template">
+  <article class="brief">
+    <div class="doc-hd">
+      <div class="t">The Brookside Brief</div>
+      <div class="s">A morning briefing on markets, macro, and the day ahead</div>
+      <div class="d">Wednesday, May 20, 2026 · 9:30 AM ET</div>
+    </div>
+
+    <h2><span class="num">1</span>The Morning Setup</h2>
+    <p class="lede">Good morning, and welcome to the most consequential trading day of the quarter. After the closing bell tonight, Nvidia will report — and with it, deliver the single most important verdict the market will hear on whether the AI capital-expenditure supercycle is still accelerating or finally plateauing. The setup is electric: the stock has rebounded 1.6% pre-market to $224 and dragged the entire semiconductor complex up with it (Intel +4.8%, Marvell +4.7%, Micron +3.4%), snapping what had been a grim three-day slide.</p>
+    <p>That slide has a name, and it is the long bond. The 30-year Treasury yield hit 5.198% yesterday — its highest level since July 2007, nearly nineteen years. A Bank of America fund manager survey out this morning shows 62% of respondents now expect the 30-year to eventually reach 6%, a level last seen in 1999. The S&amp;P 500 fell for a third straight session Tuesday, closing at 7,353.61, as the relentless climb in yields overwhelmed an otherwise calmer oil tape. This is the central tension of the moment: a still-humming earnings story colliding with a bond market that is rapidly repricing the entire cost of capital.</p>
+    <p>There is real news beyond Nvidia today. Powell speaks at 9:00 a.m. at the Atlanta Fed — his first remarks since the hot CPI/PPI prints. The Treasury sells $16 billion of 20-year bonds at 1:00 p.m., a genuine stress test of demand at these levels. And the retail read continues: Lowe's beat this morning, Target reports before the open. But make no mistake — everything today is a warm-up act for 4:20 p.m., when Jensen Huang steps to the microphone.</p>
+
+    <h2><span class="num">2</span>Markets at a Glance</h2>
+    <div class="tbl-grid">
+      <table class="mkt">
+        <caption>U.S. Equity Futures (pre-open)</caption>
+        <thead><tr><th>Asset</th><th>Last</th><th>Chg</th><th>% Chg</th></tr></thead>
+        <tbody>
+          <tr><td>S&amp;P 500 (ES)</td><td>7,383</td><td>+30</td><td class="up">+0.40%</td></tr>
+          <tr><td>Nasdaq 100 (NQ)</td><td>25,975</td><td>+180</td><td class="up">+0.70%</td></tr>
+          <tr><td>Dow (YM)</td><td>49,470</td><td>+105</td><td class="up">+0.21%</td></tr>
+          <tr><td>Russell 2000 (RTY)</td><td>2,242</td><td>+8</td><td class="up">+0.36%</td></tr>
+        </tbody>
+      </table>
+      <table class="mkt">
+        <caption>Prior Close — Tuesday, May 19</caption>
+        <thead><tr><th>Asset</th><th>Last</th><th>Chg</th><th>% Chg</th></tr></thead>
+        <tbody>
+          <tr><td>S&amp;P 500</td><td>7,353.61</td><td>−49.44</td><td class="dn">−0.67%</td></tr>
+          <tr><td>Nasdaq Composite</td><td>25,870.71</td><td>−220.02</td><td class="dn">−0.84%</td></tr>
+          <tr><td>Dow Jones Ind.</td><td>49,363.88</td><td>−322.24</td><td class="dn">−0.65%</td></tr>
+          <tr><td>Russell 2000</td><td>2,233.90</td><td>−4.15</td><td class="dn">−0.19%</td></tr>
+          <tr><td>VIX</td><td>21.6</td><td>+1.2</td><td class="dn">+5.9%</td></tr>
+        </tbody>
+      </table>
+      <table class="mkt">
+        <caption>Rates &amp; FX</caption>
+        <thead><tr><th>Asset</th><th>Last</th><th>Chg</th><th>Note</th></tr></thead>
+        <tbody>
+          <tr><td>UST 2-Year</td><td>4.39%</td><td>+3 bps</td><td>—</td></tr>
+          <tr><td>UST 10-Year</td><td>4.67%</td><td>+7 bps</td><td>—</td></tr>
+          <tr><td>UST 30-Year</td><td>5.19%</td><td>+7 bps</td><td class="flag">19-yr high</td></tr>
+          <tr><td>DXY (Dollar)</td><td>99.45</td><td>+0.27</td><td class="up">+0.27%</td></tr>
+          <tr><td>EUR/USD</td><td>1.0708</td><td>−0.0034</td><td class="dn">−0.32%</td></tr>
+          <tr><td>USD/JPY</td><td>158.90</td><td>+0.70</td><td class="up">+0.44%</td></tr>
+        </tbody>
+      </table>
+      <table class="mkt">
+        <caption>Commodities &amp; Crypto</caption>
+        <thead><tr><th>Asset</th><th>Last</th><th>Chg</th><th>% Chg</th></tr></thead>
+        <tbody>
+          <tr><td>WTI Crude (Jun)</td><td>$102.40</td><td>−$0.70</td><td class="dn">−0.68%</td></tr>
+          <tr><td>Brent Crude (Jul)</td><td>$106.10</td><td>−$0.75</td><td class="dn">−0.70%</td></tr>
+          <tr><td>Gold (spot)</td><td>$1,755</td><td>−$7</td><td class="dn">−0.40%</td></tr>
+          <tr><td>Silver (spot)</td><td>$20.18</td><td>−$0.14</td><td class="dn">−0.69%</td></tr>
+          <tr><td>Bitcoin</td><td>$77,150</td><td>−$1,270</td><td class="dn">−1.62%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <table class="mkt" style="margin-top:4px;">
+      <caption>Asia &amp; Europe</caption>
+      <thead><tr><th>Asset</th><th>Last</th><th>Chg</th><th>% Chg</th></tr></thead>
+      <tbody>
+        <tr><td>Nikkei 225</td><td>38,205</td><td>−180</td><td class="dn">−0.47%</td></tr>
+        <tr><td>Hang Seng</td><td>21,025</td><td>−55</td><td class="dn">−0.26%</td></tr>
+        <tr><td>ASX 200</td><td>8,455</td><td>−23</td><td class="dn">−0.27%</td></tr>
+        <tr><td>Stoxx Europe 600</td><td>556.10</td><td>−1.10</td><td class="dn">−0.20%</td></tr>
+        <tr><td>FTSE 100</td><td>8,705</td><td>+10</td><td class="up">+0.11%</td></tr>
+        <tr><td>DAX</td><td>19,860</td><td>−60</td><td class="dn">−0.30%</td></tr>
+      </tbody>
+    </table>
+
+    <h2><span class="num">3</span>Top Stories</h2>
+    <h3>Nvidia Reports Tonight — The AI Trade's Make-or-Break Moment</h3>
+    <p>At 4:20 p.m. ET, Nvidia delivers Q1 FY27 results, with the Street looking for $1.76 in EPS (up from $0.96 a year ago) on revenue of $79.04 billion — a 78% year-over-year jump. But as every desk note this morning reiterates, the print is about guidance, not the quarter. Consensus for Q2 FY27 revenue sits near $87 billion; the bull case wants $90B-plus, and the whisper number for data-center revenue is $74 billion. The options market is pricing a ±7.2% move — roughly $250 billion of market cap in either direction. Nvidia rebounded 1.6% to $224 pre-market, leading a broad semiconductor bid (SMH +2.2%) that has lifted the entire tape out of its three-day funk. The risk symmetry is brutal: a beat-and-raise likely reignites the year-end chase, while any guidance wobble — especially on China or gross margins — confirms the rotation out of megacap growth that has been quietly underway for two weeks.</p>
+    <h3>30-Year Yield Hits 19-Year High — Fund Managers Eye 6%</h3>
+    <p>The long bond yield touched 5.198% Tuesday, its highest since July 2007, and is holding near 5.19% this morning. The move is no longer a curiosity — it is the dominant macro force in the market. A BofA global fund manager survey released today found 62% of respondents expect the 30-year to eventually reach 6%. The mechanical consequences are spreading: the 30-year fixed mortgage rate has climbed to 7.91%, the highest of the cycle; auto-loan and small-business borrowing costs are following; and the equity risk premium has compressed to its thinnest since 2002. Today's $16B 20-year auction at 1:00 p.m. is the immediate test. A weak result would send the long end higher still and could overshadow even Nvidia.</p>
+    <h3>Lowe's Beats; Target on Deck — Consumer Read Stays Resilient</h3>
+    <p>Lowe's reported Q1 net sales of $23.1 billion (up from $20.9B a year ago), net income of $1.63 billion, and adjusted EPS of $3.03 — ahead of estimates. Comparable sales rose 0.6%, with online sales up a striking 15.5% and continued strength in Pro, appliances, and home services. Management guided full-year adjusted EPS to $12.25–$12.75. Coming a day after Home Depot's beat, the read-through is clear: the rate-sensitive home-improvement consumer is bending but emphatically not breaking. Target reports before the open this morning; the bar is low after a 22% YTD decline.</p>
+    <h3>Powell Speaks at 9:00 — First Remarks Since the Inflation Shock</h3>
+    <p>Chair Powell opens the Atlanta Fed's financial markets conference at 9:00 a.m. ET, his first public remarks since the April CPI (+3.8% Y/Y) and PPI (+6.0% Y/Y) prints upended the rate outlook. The market is desperate for signal on whether the Committee views the energy-driven inflation surge as transitory or structural. Any deviation from the careful April 29 statement language will move the front end of the curve hard. With the long bond already at a 19-year high, Powell has every incentive to sound measured.</p>
+    <h3>Oil Stabilizes Near $102 as Iran Diplomacy Limps Forward</h3>
+    <p>WTI is holding near $102 and Brent near $106 this morning, consolidating after Monday's sharp drop on news that President Trump shelved a planned strike. Iran submitted an updated peace proposal to mediators in Pakistan, but the White House reportedly considers it insufficient. The Strait of Hormuz remains partially restricted, with tanker traffic well below normal. A collapse in talks would put $115 Brent back in play within days.</p>
+
+    <h2><span class="num">4</span>Macro &amp; Fed Watch</h2>
+    <p>Two Fed events bracket the next 30 hours: Powell at 9:00 a.m. today, and the April 28–29 FOMC minutes tomorrow at 2:00 p.m. The minutes are the bigger market event. They will reveal how deep the four-way dissent ran — Hammack and Logan pushed for a hike, Kashkari wanted optionality — and whether the Committee's confidence that longer-run inflation expectations remain anchored is fraying.</p>
+    <p>Fed funds futures now price a 41% probability of a hike by December (up from 38% Monday and 12% a month ago) and effectively 100% by March 2027. The repricing has been violent and one-directional. The only thing that reliably reverses it would be a genuine growth scare — which is why Friday's flash PMIs suddenly matter more than they have in months. For now, the curve is bear-steepening: the 2s30s spread has widened to 80 basis points, the steepest since 2021.</p>
+
+    <h2><span class="num">5</span>Economic Calendar — Rest of Week</h2>
+    <table class="mkt">
+      <thead><tr><th>Day</th><th style="text-align:left">Time (ET)</th><th style="text-align:left">Release</th><th style="text-align:left">Consensus / Actual</th></tr></thead>
+      <tbody>
+        <tr><td>Wed 5/20</td><td style="text-align:left">Before open</td><td style="text-align:left">Lowe's (LOW) Q1 — <span class="up">BEAT ✓</span></td><td style="text-align:left">adj $3.03 / $23.1B</td></tr>
+        <tr><td>Wed 5/20</td><td style="text-align:left">Before open</td><td style="text-align:left">Target (TGT) Q1</td><td style="text-align:left">EPS ~$1.30 / Rev $24.5B</td></tr>
+        <tr><td>Wed 5/20</td><td style="text-align:left">9:00 AM</td><td style="text-align:left">Powell remarks — Atlanta Fed</td><td style="text-align:left">—</td></tr>
+        <tr><td>Wed 5/20</td><td style="text-align:left">1:00 PM</td><td style="text-align:left">20-Yr Treasury auction ($16B)</td><td style="text-align:left">—</td></tr>
+        <tr><td>Wed 5/20</td><td style="text-align:left">After close</td><td style="text-align:left">Nvidia (NVDA) Q1 FY27</td><td style="text-align:left">EPS $1.76 / Rev $79.0B</td></tr>
+        <tr><td>Thu 5/21</td><td style="text-align:left">8:30 AM</td><td style="text-align:left">Housing Starts / Permits (Apr)</td><td style="text-align:left">1.44M / 1.36M</td></tr>
+        <tr><td>Thu 5/21</td><td style="text-align:left">8:30 AM</td><td style="text-align:left">Initial Jobless Claims</td><td style="text-align:left">228K</td></tr>
+        <tr><td>Thu 5/21</td><td style="text-align:left">Before open</td><td style="text-align:left">Walmart (WMT) Q1</td><td style="text-align:left">EPS $0.66 / Rev $171B</td></tr>
+        <tr><td>Thu 5/21</td><td style="text-align:left">2:00 PM</td><td style="text-align:left">FOMC Minutes (Apr 28–29)</td><td style="text-align:left">—</td></tr>
+        <tr><td>Fri 5/22</td><td style="text-align:left">9:45 AM</td><td style="text-align:left">S&amp;P Global Flash PMIs (May)</td><td style="text-align:left">Mfg 49.2 / Svc 51.3</td></tr>
+      </tbody>
+    </table>
+
+    <h2><span class="num">6</span>Earnings Watch</h2>
+    <p>The week's two storylines — AI capex and the rate-pressured consumer — both crest today. On the consumer side, Lowe's beat (adj. $3.03, comps +0.6%, online +15.5%) confirms the Home Depot read: home-improvement demand is stabilizing even with mortgage rates near 8%. Target before the open is the wild card; sentiment is washed out and the options market implies a ±8.5% move. The marquee event is Nvidia tonight — watch Q2 revenue guidance (>$90B is the bull line), gross-margin trajectory (Blackwell ramp), and China H20 commentary. Roughly 95% of the S&amp;P 500 has now reported Q1, with blended growth at +11.4% and 76% beating on EPS.</p>
+
+    <h2><span class="num">7</span>Sector Spotlight: Semiconductors</h2>
+    <p>All eyes — and an outsized share of index weight — sit on the chips today. The iShares Semiconductor ETF (SMH) is up 2.2% pre-market, with the rebound notably broad: Intel +4.8%, Marvell +4.7%, Micron +3.4%, Broadcom +2.1%, AMD +1.9%. The breadth suggests a genuine pre-Nvidia risk-on rotation rather than a narrow Nvidia-only trade. The semis carry roughly 11% of S&amp;P 500 weight; a 7% Nvidia move translates to roughly 30 S&amp;P points on its own. This is the rare single corporate event with genuine index-level consequences — closer to a Fed day than an ordinary earnings report.</p>
+
+    <h2><span class="num">8</span>Analyst Calls Driving Action</h2>
+    <p><strong>Upgrades / target hikes:</strong> Morgan Stanley raised Nvidia to $245 (from $230), Cantor to $260 (from $220), and Melius to $275 — the Street high. Citi reiterated Buy on Lowe's with a $290 PT. Evercore upgraded Intel to In-Line with a $120 PT on foundry-order momentum. KeyBanc raised Micron to Overweight on HBM pricing power.</p>
+    <p><strong>Downgrades / target cuts:</strong> Wells Fargo downgraded Realty Income (O) and Federal Realty (FRT) to Equal-Weight. Barclays trimmed homebuilder targets across the board (DHI, LEN, PHM) on the mortgage-rate spike. Goldman cut long-duration tech names UiPath (PATH) and Snowflake (SNOW) on multiple compression from higher discount rates.</p>
+
+    <h2><span class="num">9</span>Stocks to Watch</h2>
+    <ul>
+      <li><strong>Nvidia (NVDA)</strong> — Pre-market $224, up 1.6%. Reports after close. Implied move ±7.2%. Q2 guidance above $90B is the bull line; watch China H20 commentary and Blackwell gross margins.</li>
+      <li><strong>Target (TGT)</strong> — Reports before open. Implied move ±8.5%. Washed-out sentiment + low bar = squeeze setup on any clean print.</li>
+      <li><strong>Lowe's (LOW)</strong> — Up ~3% pre-market on the beat. Watch follow-through above the $250 level.</li>
+      <li><strong>Intel (INTC)</strong> — +4.8% pre-market to $115.58, leading the chip rebound on foundry-order momentum and the Evercore upgrade.</li>
+      <li><strong>Micron (MU)</strong> — +3.4% on the KeyBanc upgrade and HBM pricing tailwinds; a key Nvidia-supply-chain proxy into tonight.</li>
+      <li><strong>Homebuilders (DHI, LEN, PHM)</strong> — Under pressure as the 30-year mortgage rate hits 7.91%. Barclays target cuts add to the bearish tone.</li>
+      <li><strong>TLT (20+ Yr Treasury ETF)</strong> — At a fresh 52-week low. The single cleanest expression of the long-bond stress; watch the 1:00 p.m. 20-year auction.</li>
+    </ul>
+
+    <h2><span class="num">10</span>Global Macro Snapshot</h2>
+    <p><strong>Europe:</strong> Stoxx 600 modestly lower, tracking the U.S. rates move; the German 10-year Bund yield climbed to 2.78%, a fresh multi-month high. UK April CPI printed +3.3% Y/Y this morning, a touch hotter than the 3.2% consensus. ECB's Lagarde speaks tomorrow at the Brussels Forum.</p>
+    <p><strong>Asia:</strong> Markets reopened after Monday's holidays and traded modestly lower — Nikkei −0.47%, Hang Seng −0.26% — as the global bond selloff weighed. Japan's stronger-than-expected Q1 GDP (+2.1% annualized) keeps a June BoJ hike on the table; the yen held near 158.90.</p>
+    <p><strong>Emerging markets:</strong> The renewed dollar bid is pressuring EM FX again. Turkey's central bank decision tomorrow is the regional focus; consensus is for the benchmark to hold at 50%. India's Sensex remains the EM outperformer, up 2% over the past month.</p>
+
+    <h2><span class="num">11</span>Week Ahead Preview</h2>
+    <p>The next 30 hours carry more event risk than the rest of the month combined. <strong>(1) Tonight, after close — Nvidia:</strong> Q2 guidance above $90B reignites the AI trade and likely the broad tape; below $87B confirms the rotation out of megacap growth. <strong>(2) Tomorrow 2:00 p.m. — FOMC minutes:</strong> the read on how serious the hike camp is; a hawkish set pushes the 30-year toward 5.25%+. <strong>(3) Friday 9:45 a.m. — flash PMIs:</strong> the first hint of whether the rate and energy shock is finally crimping growth. Also on deck: Walmart Thursday and Powell today at 9:00.</p>
+
+    <h2><span class="num">12</span>The Closing Thought</h2>
+    <p>Markets love a clean narrative, and today they have an unusually pure one: a single company, reporting after a single bell, will tell us whether the defining investment theme of the decade is still intact. But the more important story may be the quieter one playing out in the bond market, where the 30-year yield just hit a level not seen in nineteen years and fund managers are openly discussing 6%. If Nvidia delivers and the AI trade roars back, the celebration could be short-lived — because a 6% long bond eventually breaks something, whether it is housing, leveraged credit, or the equity multiple itself. Tonight we learn about the numerator. The denominator, sitting at 5.19% and climbing, is the part that should keep you up at night. Trade it carefully.</p>
+
+    <div class="signoff">— The Brookside Brief · Compiled 9:30 AM ET · Sources: WSJ, CNBC, CNN, Bloomberg, Reuters, Kiplinger, TradingEconomics, S&amp;P Global, BLS, U.S. Treasury —</div>
+  </article>
+</template>
+
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(shasum -a 256)",
+      "Bash(sips -z 220 220 \"/Users/flamesjanagan/Documents/Claude/Projects/Daily Financial Brief/badger-logo.png\" --out /tmp/badger-small.png)",
+      "Read(//tmp/**)",
+      "Bash(echo \"data:image/png;base64,$\\(base64 -i /tmp/badger-small.png | tr -d '\\\\n'\\)\")",
+      "Bash(python3 -)",
+      "Bash(sips -g pixelWidth -g pixelHeight \"/Users/flamesjanagan/Documents/Claude/Projects/Daily Financial Brief/generated-image.png\")"
+    ]
+  }
+}
