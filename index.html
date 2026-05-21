@@ -278,7 +278,7 @@
   .masthead .crest{cursor:pointer;user-select:none;}
 </style>
 </head>
-<body class="admin-mode"><script id="publishBootstrap">
+<body><script id="publishBootstrap">
 (function injectPublishedBriefs(){
   document.addEventListener("DOMContentLoaded", function(){
     document.querySelectorAll("template.uploaded-brief").forEach(function(tpl){
@@ -753,6 +753,9 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
       // Clone the current document
       const clone = document.documentElement.cloneNode(true);
+
+      // Always strip admin-mode so visitors never see the admin panel
+      clone.querySelector("body").classList.remove("admin-mode");
 
       // Remove any existing uploaded-brief <template> tags we previously injected
       clone.querySelectorAll("template.uploaded-brief").forEach(t=>t.remove());
